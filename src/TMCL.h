@@ -1,3 +1,4 @@
+#pragma once
 #include <Stream.h>
 
 // TODO this needs to be documented & cleaned up
@@ -37,9 +38,9 @@ class TMCLInterface
 public:
   TMCLInterface(Stream* serial);
 
-  void send(TMCLTelegram& telegram);
-  bool receive(TMCLTelegram& telegram, int timeoutMillis = 1000);
-  bool sendAndReceive(TMCLTelegram& telegram, int timeoutMillis = 1000);
+  void send(TMCLTelegram* telegram);
+  bool receive(TMCLTelegram* telegram, int timeoutMillis = 1000);
+  bool sendAndReceive(TMCLTelegram* telegram, int timeoutMillis = 1000);
 
   void setDebug(Stream* debug) { m_debug = debug; };
 
