@@ -21,8 +21,23 @@ them.
 
 For development, the _nodeMCU v2_ board is a good choice.
 
-## API
+### Automatically Download TMCL Program
 
+You can automatically download a binary TMCL program to the module each time
+the MCU boots.
+Binary TMCL programs can be created using the [Trinamic TMCL-IDE][1].
+
+To use this feature, place the compiled program in `data/tmcl.bin` and run the command
+`platformio run --target uploadfs`.
+
+> **Warning:** This is potentially dangerous and has not been tested much.
+> Use at your own risk.
+>
+> That being said, it seems almost impossible to brick a TMCL module.
+> If the module is "stuck" after a failed download, cycle power
+> and try again.
+
+## API
 
 The HTTP API endpoint is `http://<ip>/tmcl`. It supports two methods, `GET`
 and `POST`.

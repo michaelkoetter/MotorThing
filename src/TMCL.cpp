@@ -247,3 +247,14 @@ void TMCLDownload::download(unsigned char* buf, unsigned int size)
     }
   }
 }
+
+void TMCLDownload::download(Stream& stream)
+{
+  unsigned char buf[TMCL_DOWNLOAD_SIZE];
+  begin();
+  while (stream.available() >= TMCL_DOWNLOAD_SIZE) {
+    stream.readBytes(buf, TMCL_DOWNLOAD_SIZE);
+    download(buf, TMCL_DOWNLOAD_SIZE);
+  }
+  end();
+}

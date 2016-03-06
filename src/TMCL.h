@@ -5,6 +5,7 @@
 
 #define TMCL_TELEGRAM_PAUSE_DEFAULT 5
 #define TMCL_TELEGRAM_SIZE 9
+#define TMCL_DOWNLOAD_SIZE 8
 
 class TMCLTelegram
 {
@@ -102,12 +103,13 @@ public:
   void begin();
   void end();
   void download(unsigned char* buf, unsigned int size);
+  void download(Stream& stream);
 
   bool error() { return m_error; }
 
 private:
   void            sendAndCheck(char status);
-  
+
   TMCLInterface*  m_interface;
   TMCLTelegram*   m_telegram;
   bool            m_error;
