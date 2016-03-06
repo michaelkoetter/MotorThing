@@ -21,8 +21,11 @@ For development, the _nodeMCU v2_ board is a good choice.
 
 ## API
 
+
 The HTTP API endpoint is `http://<ip>/tmcl`. It supports two methods, `GET`
 and `POST`.
+
+### Get Module Version
 
 `GET /tmcl` will get the module version and return it as a JSON object.
 
@@ -31,6 +34,8 @@ and `POST`.
     "version": "<version>"
 }
 ```
+
+### Execute TMCL Instruction
 
 `POST /tmcl` will execute a TMCL instruction, specified as JSON object:
 
@@ -68,6 +73,22 @@ In addition, the TMCL reply `"status"` attribute might contain an error code
 
 Please refer to the [TMCL Documentation][1] for information on available
  instructions and their parameters.
+
+### Download TMCL Program
+
+`PUT /tmcl` will download a binary TMCL program to the module's EEPROM.
+Binary TMCL programs can be created using the [Trinamic TMCL-IDE][1].
+
+Use a `multipart/form-data` file upload to send the binary file.
+
+If there is an error, HTTP status `500` will be sent.
+
+> **Warning:** This is potentially dangerous and has not been tested much.
+> Use at your own risk.
+>
+> That being said, it seems almost impossible to brick a TMCL module.
+> If the module is "stuck" after a failed download, cycle power
+> and try again.
 
 ## Examples
 
@@ -127,4 +148,4 @@ Response:
 }
 ```
 
-[1]: http://www.trinamic.com/software-tools/tmcl-ide#HEAD_Downloads_Documentation
+[1]: http://www.trinamic.com/software-tools/tmcl-ide
