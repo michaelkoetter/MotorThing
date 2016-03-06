@@ -1,5 +1,7 @@
 # MotorThing - WiFi-enabled Motion Control
 
+[![Build Status](https://travis-ci.org/michaelkoetter/MotorThing.svg?branch=master)](https://travis-ci.org/michaelkoetter/MotorThing)
+
 **_Work in Progress!_**
 
 The MotorThing is a WiFi bridge for [Trinamic TMCL][1] (_Trinamic Motion Control
