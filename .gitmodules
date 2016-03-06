@@ -1,3 +1,0 @@
-[submodule "lib/ESPSoftwareSerial"]
-	path = lib/ESPSoftwareSerial
-	url = https://github.com/michaelkoetter/espsoftwareserial.git
