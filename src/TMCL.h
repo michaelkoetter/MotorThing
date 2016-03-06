@@ -9,7 +9,7 @@
 class TMCLTelegram
 {
 public:
-  TMCLTelegram(char* buffer, unsigned int size = TMCL_TELEGRAM_SIZE);
+  TMCLTelegram(char* buffer, unsigned int size);
 
   char              data(unsigned int position);
   void              data(unsigned int position, char data);
@@ -17,6 +17,7 @@ public:
   int               intData(unsigned int position);
   void              intData(unsigned int position, int data);
 
+  void              reset();
   unsigned int      size() { return m_size; }
 
   unsigned char     checksum() { return data(size()-1); }
@@ -91,4 +92,24 @@ public:
   void print(Stream& stream);
 private:
   TMCLTelegram*     m_telegram;
+};
+
+class TMCLDownload
+{
+public:
+  TMCLDownload(TMCLInterface* interface, TMCLTelegram* telegram);
+
+  void begin();
+  void end();
+  void download(unsigned char* buf, unsigned int size);
+
+  bool error() { return m_error; }
+
+private:
+  void            sendAndCheck(char status);
+  
+  TMCLInterface*  m_interface;
+  TMCLTelegram*   m_telegram;
+  bool            m_error;
+  bool            m_downloading;
 };

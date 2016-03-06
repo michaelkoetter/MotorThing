@@ -35,4 +35,5 @@ private:
   // buffer has one extra byte to terminate version string
   char            m_tmclBuf[TMCL_TELEGRAM_SIZE + 1];
   TMCLTelegram    *m_tmclTelegram;
+  TMCLDownload    *m_tmclDownload;
 };

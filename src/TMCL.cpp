@@ -36,6 +36,10 @@ void TMCLTelegram::intData(unsigned int position, int data) {
   }
 }
 
+void TMCLTelegram::reset() {
+  memset(m_buffer, 0, m_size);
+}
+
 void TMCLTelegram::print(Stream& stream)
 {
   for (int i = 0; i < m_size; i++) {
@@ -128,11 +132,8 @@ TMCLInstruction::TMCLInstruction(TMCLTelegram* telegram)
 }
 
 void TMCLInstruction::reset() {
+  m_telegram->reset();
   moduleAddress(1);
-  instruction(0);
-  type(0);
-  motor(0);
-  value(0);
 }
 
 void TMCLInstruction::print(Stream& stream)
@@ -154,4 +155,95 @@ void TMCLReply::print(Stream& stream)
   stream.printf("REPLY %d->%d status: %d instruction: %d value: %d (CRC %s)\n",
     moduleAddress(), hostAddress(), status(), instruction(), value(),
     m_telegram->checksumOK() ? "OK" : "ERROR");
+}
+
+TMCLDownload::TMCLDownload(TMCLInterface* interface, TMCLTelegram* telegram)
+  : m_interface(interface), m_telegram(telegram), m_error(false), m_downloading(false)
+{
+
+}
+
+void TMCLDownload::sendAndCheck(char status)
+{
+  if (m_interface->sendAndReceive(m_telegram)) {
+    TMCLReply reply(m_telegram);
+    if (!m_telegram->checksumOK() || reply.status() != status) {
+      // TMCL error
+      m_error = true;
+    }
+  } else {
+    // timeout
+    m_error = true;
+  }
+}
+
+
+void TMCLDownload::begin()
+{
+  if (!m_downloading) {
+    m_downloading = true;
+    m_error = false;
+
+    TMCLInstruction startDownload(m_telegram);
+    startDownload.reset();
+    startDownload.instruction(132);
+    sendAndCheck(100);
+  }
+}
+
+void TMCLDownload::end()
+{
+  if (m_downloading) {
+    m_downloading = false;
+
+    TMCLInstruction stopDownload(m_telegram);
+    // send a "NOOP"
+    stopDownload.reset();
+    sendAndCheck(101);
+
+    // send the actual stop instruction
+    stopDownload.reset();
+    stopDownload.instruction(133);
+    sendAndCheck(100);
+  }
+}
+
+void TMCLDownload::download(unsigned char* buf, unsigned int size)
+{
+  if (m_error || !m_downloading) return;  // can't continue
+
+  // The binary download format is 8 bytes per instruction, it doesn't contain
+  // the module address (first byte)
+
+  int telegramPos = 0;
+  for (int bufPos = 0; bufPos < size; bufPos++) {
+    if (m_error) break;
+
+    if (telegramPos == 0) {
+      m_telegram->reset();
+      telegramPos++;
+    }
+
+    if (telegramPos < m_telegram->size()) {
+      m_telegram->data(telegramPos++, buf[bufPos]);
+
+      if (telegramPos >= m_telegram->size()) {
+        Serial.print("DOWNLOAD");
+        m_telegram->print(Serial);
+        Serial.print("\n");
+
+        if (m_telegram->checksumOK()) {
+          // finished - add address and send!
+          m_telegram->data(0, 1);
+          m_telegram->updateChecksum();
+          telegramPos = 0;
+          sendAndCheck(101);
+          yield();
+        } else {
+          // checksum error in download data
+          m_error = true;
+        }
+      }
+    }
+  }
 }

@@ -4,11 +4,13 @@ TMCLRequestHandler::TMCLRequestHandler(const char* uri, TMCLInterface* tmclInter
   : m_uri(uri), m_tmclInterface(tmclInterface)
 {
   memset(m_tmclBuf, 0, TMCL_TELEGRAM_SIZE + 1);
-  m_tmclTelegram = new TMCLTelegram(m_tmclBuf);
+  m_tmclTelegram = new TMCLTelegram(m_tmclBuf, TMCL_TELEGRAM_SIZE);
+  m_tmclDownload = new TMCLDownload(m_tmclInterface, m_tmclTelegram);
 }
 
 TMCLRequestHandler::~TMCLRequestHandler()
 {
+  delete m_tmclDownload;
   delete m_tmclTelegram;
 }
 
@@ -169,12 +171,34 @@ void TMCLRequestHandler::handlePost(ESP8266WebServer& server)
 
 void TMCLRequestHandler::handlePut(ESP8266WebServer& server)
 {
-  server.send(200, "text/plain", "OK");
+  if (!m_tmclDownload->error()) {
+    server.send(200, "text/plain", "TMCL download OK");
+  } else {
+    server.send(500, "text/plain", "TMCL download error");
+  }
 }
 
+/**
+ * Uploads a compiled TMCL program (.bin file) to the module.
+ */
 void TMCLRequestHandler::handleUpload(ESP8266WebServer& server, HTTPUpload& upload)
 {
+  TMCLInstruction instruction(m_tmclTelegram);
+  TMCLReply reply(m_tmclTelegram);
 
+  if (upload.status == UPLOAD_FILE_START) {
+    Serial.printf("Upload start: %s \n", upload.filename.c_str());
+    m_tmclDownload->begin();
+  } else if (upload.status == UPLOAD_FILE_WRITE) {
+    Serial.printf("Upload write: %s (%d bytes) \n", upload.filename.c_str(), upload.currentSize);
+    m_tmclDownload->download(upload.buf, upload.currentSize);
+  } else if (upload.status == UPLOAD_FILE_END || upload.status == UPLOAD_FILE_ABORTED) {
+    Serial.printf("Upload end: %s \n", upload.filename.c_str());
+    m_tmclDownload->end();
+    Serial.printf("TMCL download status: %s\n",
+      m_tmclDownload->error() ? "ERROR" : "OK");
+  }
+  yield();
 }
 
 void TMCLRequestHandler::sendJson(ESP8266WebServer& server, JsonObject& json)
