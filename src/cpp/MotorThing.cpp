@@ -8,6 +8,7 @@
 
 #include "TMCL.h"
 #include "TMCLRequestHandler.h"
+#include "FSRequestHandler.h"
 
 #define RS485_RO 13
 #define RS485_DI 14
@@ -28,6 +29,7 @@ TMCLInterface tmclInterface(&tmclSerial);
 ESP8266WebServer http(HTTP_PORT);
 
 TMCLRequestHandler tmclRequestHandler("/tmcl", &tmclInterface);
+FSRequestHandler fsRequestHandler(SPIFFS, "/", "/web", true, true);
 
 void setup() {
   Serial.begin(115200);
@@ -43,7 +45,8 @@ void setup() {
 
   if (SPIFFS.begin()) {
     Serial.print("SPIFFS mounted. \n");
-    http.serveStatic("/", SPIFFS, "/web/");
+    fsRequestHandler.setDebug(&Serial);
+    http.addHandler(&fsRequestHandler);
 
     if (SPIFFS.exists(TMCL_INIT_FILE)) {
       Serial.printf("Found '%s', starting TMCL download... \n", TMCL_INIT_FILE);
