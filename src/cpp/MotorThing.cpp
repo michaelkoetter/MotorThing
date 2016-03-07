@@ -39,9 +39,12 @@ void setup() {
   tmclSerial.setTransmitEnablePin(RS485_DE);
   tmclSerial.begin(RS485_SPEED);
   tmclInterface.setDebug(&Serial);
+  http.addHandler(&tmclRequestHandler);
 
   if (SPIFFS.begin()) {
     Serial.print("SPIFFS mounted. \n");
+    http.serveStatic("/", SPIFFS, "/web/");
+
     if (SPIFFS.exists(TMCL_INIT_FILE)) {
       Serial.printf("Found '%s', starting TMCL download... \n", TMCL_INIT_FILE);
       File tmclBin = SPIFFS.open(TMCL_INIT_FILE, "r");
@@ -69,7 +72,6 @@ void setup() {
     Serial.printf("MDNS host: %s.local IP: %s \n", MDNS_HOST, WiFi.softAPIP().toString().c_str());
   }
 
-  http.addHandler(&tmclRequestHandler);
   http.begin();
   Serial.printf("HTTP Server listening on port %d. \n", HTTP_PORT);
 
