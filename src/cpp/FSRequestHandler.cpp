@@ -84,6 +84,7 @@ bool FSRequestHandler::sendFile(ESP8266WebServer& server, String& fileName, Stri
     return false;
 
   server.streamFile(file, contentType);
+  file.close();
   return true;
 }
 
