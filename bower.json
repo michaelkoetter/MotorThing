@@ -1,0 +1,32 @@
+{
+  "name": "MotorThing",
+  "homepage": "https://github.com/michaelkoetter/MotorThing",
+  "authors": [
+    "Michael Kötter <michael@m-koetter.de>"
+  ],
+  "description": "WiFi-enabled Motion Control",
+  "main": [
+    "src/web/js/*.js",
+    "src/web/css/*.css",
+    "src/web/*.html",
+    "src/web/**/*.html",
+    "src/web/**/*.tag"
+  ],
+  "private": true,
+  "dependencies": {
+    "riot": "^2.3.16",
+    "Phonon-Framework": "https://github.com/quark-dev/Phonon-Framework.git#=1.1.9"
+  },
+  "overrides": {
+    "Phonon-Framework": {
+      "main": [
+        "dist/js/phonon.js",
+        "dist/css/phonon.css",
+        "dist/fonts/material-design-icons.woff"
+      ]
+    },
+    "riot": {
+      "main": "riot+compiler.js"
+    }
+  }
+}

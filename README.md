@@ -21,7 +21,16 @@ them.
 
 For development, the _nodeMCU v2_ board is a good choice.
 
-### Automatically Download TMCL Program
+## Building the Firmware
+
+> TODO Describe how to compile the ESP8266 firmware..._
+
+## Building the Webapp
+
+> TODO Describe how to build the webapp and compressed filesystem for the
+> embedded webserver...
+
+## Automatically Download TMCL Program
 
 You can automatically download a binary TMCL program to the module each time
 the MCU boots.
