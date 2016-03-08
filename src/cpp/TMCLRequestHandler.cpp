@@ -26,10 +26,6 @@ bool TMCLRequestHandler::canUpload(String requestUri)
 
 bool TMCLRequestHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri)
 {
-  for (int i = 0; i < server.headers(); i++) {
-    Serial.printf("[Header] %s = %s \n", server.headerName(i).c_str(), server.header(i).c_str());
-  }
-
   switch (requestMethod) {
     case HTTP_GET:
       handleGet(server);
