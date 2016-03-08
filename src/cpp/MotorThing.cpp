@@ -28,6 +28,11 @@ TMCLInterface tmclInterface(&tmclSerial);
 
 ESP8266WebServer http(HTTP_PORT);
 
+#define HTTP_HEADERS_SIZE 1
+const char* httpHeaders[HTTP_HEADERS_SIZE] {
+  "Access-Control-Request-Headers"
+};
+
 TMCLRequestHandler tmclRequestHandler("/tmcl", &tmclInterface);
 FSRequestHandler fsRequestHandler(SPIFFS, "/", "/web", true, true);
 
@@ -75,6 +80,7 @@ void setup() {
     Serial.printf("MDNS host: %s.local IP: %s \n", MDNS_HOST, WiFi.softAPIP().toString().c_str());
   }
 
+  http.collectHeaders(httpHeaders, HTTP_HEADERS_SIZE);
   http.begin();
   Serial.printf("HTTP Server listening on port %d. \n", HTTP_PORT);
 

@@ -26,6 +26,10 @@ bool TMCLRequestHandler::canUpload(String requestUri)
 
 bool TMCLRequestHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri)
 {
+  for (int i = 0; i < server.headers(); i++) {
+    Serial.printf("[Header] %s = %s \n", server.headerName(i).c_str(), server.header(i).c_str());
+  }
+
   switch (requestMethod) {
     case HTTP_GET:
       handleGet(server);
@@ -36,7 +40,13 @@ bool TMCLRequestHandler::handle(ESP8266WebServer& server, HTTPMethod requestMeth
     case HTTP_PUT:
       handlePut(server);
       break;
-
+    case HTTP_OPTIONS:
+      // Support CORS requests
+      // make sure to call server.collectHeaders(--) to capture the Access-Control-Request-Headers header!
+      server.sendHeader("Access-Control-Allow-Headers", server.header("Access-Control-Request-Headers"));
+      server.sendHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
+      server.send(200, "text/plain", "Go ahead...");
+      break;
     default:
       server.send(405, "text/plain", "Method Not Allowed");
       break;
