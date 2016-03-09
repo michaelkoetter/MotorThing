@@ -1,14 +1,12 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <FS.h>
 #include <ArduinoJson.h>
 
+#include "HTTPServer.h"
 #include "TMCL.h"
-#include "TMCLRequestHandler.h"
-#include "FSRequestHandler.h"
 
 #define RS485_RO 13
 #define RS485_DI 14
@@ -26,15 +24,7 @@
 SoftwareSerial tmclSerial(RS485_RO, RS485_DI);
 TMCLInterface tmclInterface(&tmclSerial);
 
-ESP8266WebServer http(HTTP_PORT);
-
-#define HTTP_HEADERS_SIZE 1
-const char* httpHeaders[HTTP_HEADERS_SIZE] {
-  "Access-Control-Request-Headers"
-};
-
-TMCLRequestHandler tmclRequestHandler("/tmcl", &tmclInterface);
-FSRequestHandler fsRequestHandler(SPIFFS, "/", "/web", true, true);
+HTTPServer http(HTTP_PORT);
 
 void setup() {
   Serial.begin(115200);
@@ -46,12 +36,9 @@ void setup() {
   tmclSerial.setTransmitEnablePin(RS485_DE);
   tmclSerial.begin(RS485_SPEED);
   tmclInterface.setDebug(&Serial);
-  http.addHandler(&tmclRequestHandler);
 
   if (SPIFFS.begin()) {
     Serial.print("SPIFFS mounted. \n");
-    fsRequestHandler.setDebug(&Serial);
-    http.addHandler(&fsRequestHandler);
 
     if (SPIFFS.exists(TMCL_INIT_FILE)) {
       Serial.printf("Found '%s', starting TMCL download... \n", TMCL_INIT_FILE);
@@ -80,7 +67,6 @@ void setup() {
     Serial.printf("MDNS host: %s.local IP: %s \n", MDNS_HOST, WiFi.softAPIP().toString().c_str());
   }
 
-  http.collectHeaders(httpHeaders, HTTP_HEADERS_SIZE);
   http.begin();
   Serial.printf("HTTP Server listening on port %d. \n", HTTP_PORT);
 
@@ -90,5 +76,5 @@ void setup() {
 }
 
 void loop() {
-  http.handleClient();
+  http.handle();
 }
