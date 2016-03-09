@@ -1,3 +1,3 @@
-[submodule "lib/http-parser"]
-	path = lib/http-parser
-	url = https://github.com/nodejs/http-parser.git
+[submodule "lib/ESP_HTTPServer"]
+	path = lib/ESP_HTTPServer
+	url = https://github.com/michaelkoetter/ESP_HTTPServer.git
