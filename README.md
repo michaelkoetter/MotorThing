@@ -21,7 +21,7 @@ them.
 
 For development, the _nodeMCU v2_ board is a good choice.
 
-[![Transceiver Connection](doc/transceiver.png?raw=true)
+![Transceiver Connection](doc/transceiver.png?raw=true)
 
 
 ## Building the Firmware
