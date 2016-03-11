@@ -21,6 +21,9 @@ them.
 
 For development, the _nodeMCU v2_ board is a good choice.
 
+[[/michaelkoetter/MotorThing/blob/master/doc/transceiver.png]]
+
+
 ## Building the Firmware
 
 This project uses the [PlatformIO] build system.
@@ -96,7 +99,7 @@ To use this feature, place the compiled program in `data/tmcl.bin` and run the c
 > If the module is "stuck" after a failed download, cycle power
 > and try again.
 
-## Web API 
+## Web API
 
 [![Run in Postman](https://run.pstmn.io/button.png)](https://www.getpostman.com/run-collection/9dce439679000a723515#?env%5Besp8266-ap%5D=W3sia2V5IjoiaG9zdCIsInZhbHVlIjoiMTkyLjE2OC40LjEiLCJ0eXBlIjoidGV4dCIsImVuYWJsZWQiOnRydWV9XQ==")
 
