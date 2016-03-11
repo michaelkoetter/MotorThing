@@ -10,6 +10,7 @@ var gzip        = require('gulp-gzip');
 var hashsum     = require("gulp-hashsum");
 var mainBowerFiles  = require('main-bower-files');
 var fnv         = require('fnv-plus');
+var webserver = require('gulp-webserver');
 
 var src = {
   js: mainBowerFiles({includeSelf: true, filter: "**/*.js", debugging: true}),
@@ -18,12 +19,20 @@ var src = {
   woff: mainBowerFiles({includeSelf: true, filter: "**/*.woff"}),
 }
 
-gulp.task('default', ['build']);
+gulp.task('default', ['compress-data']);
 gulp.task('build', ['js-all', 'css-all', 'html-all', 'fonts-all']);
 
 gulp.task('clean', function() {
   return gulp.src(['build/web', 'data/web'], {read: false})
     .pipe(clean());
+});
+
+gulp.task('webserver', ['build'], function() {
+  return gulp.src('build/web')
+    .pipe(webserver({
+      livereload: true,
+      open: true
+    }));
 });
 
 // This prepares the static files for the embedded web server

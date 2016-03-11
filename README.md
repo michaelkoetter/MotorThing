@@ -4,7 +4,7 @@
 
 **_Work in Progress!_**
 
-The MotorThing is a WiFi bridge for [Trinamic TMCL][1] (_Trinamic Motion Control
+The MotorThing is a WiFi bridge for [Trinamic TMCL][TMCL] (_Trinamic Motion Control
 Language_) products, such as the TMCM-1110 'StepRocker' board or PANdrive
 motors.
 
@@ -23,21 +23,71 @@ For development, the _nodeMCU v2_ board is a good choice.
 
 ## Building the Firmware
 
-> TODO Describe how to compile the ESP8266 firmware..._
+This project uses the [PlatformIO] build system.
+You can use the command line tools or their IDE (recommended) to build
+and upload the firmware.
+
+Usually it boils down to a single command:
+
+```bash
+# Compile and upload to the ESP8266 / nodeMCU
+platformio run -t upload
+```
+
+Please refer to the available [PlatformIO Documentation](http://docs.platformio.org/en/latest/)
+for details on how to use it.
+
+> The project includes an environment definition for the nodeMCU v2 board,
+> you might need to adjust this if you use a different ESP8266 board
+> (see `platformio.ini`).
 
 ## Building the Webapp
 
-> TODO Describe how to build the webapp and compressed filesystem for the
-> embedded webserver...
+Building the webapp requires multiple steps.
+
+- First Source files from `src/web` and their dependencies are concatenated
+(JavaScript and CSS) and minified.
+- Then, a short filename is derived using a [FNV1a] hash.
+This is necessary to work around the 32-character limit for filenames in the
+embedded SPIFFS filesystem.
+- The resulting files are compressed using gzip to save space
+- Finally, the SPIFFS filesystem is built and uploaded to the ESP8266.
+
+The build process uses [Bower] and [Gulp], so you will need to install these first
+(and [node.js/npm][nodejs] if it is not installed already).
+
+```bash
+# Install bower and gulp CLIs
+npm install -g bower
+npm install -g gulp-cli
+
+# Install the projects dependencies:
+npm install
+bower install
+
+# Build everything
+gulp
+
+# Upload it to the ESP8266
+platformio run -t uploadfs
+
+# You can also test the webapp in a local browser
+# Install the LiveReload browser extension and run "gulp" to rebuild/reload automatically
+gulp webserver
+```
+
+> The goal is to fit a usable web app in a 64k filesystem, so it can work even
+> on the cheapest ESP8266s. If you have a board with 4M flash, the filesystem
+> can be much bigger (up to 3M).
 
 ## Automatically Download TMCL Program
 
 You can automatically download a binary TMCL program to the module each time
 the MCU boots.
-Binary TMCL programs can be created using the [Trinamic TMCL-IDE][1].
+Binary TMCL programs can be created using the [Trinamic TMCL-IDE][TMCL].
 
 To use this feature, place the compiled program in `data/tmcl.bin` and run the command
-`platformio run --target uploadfs`.
+`platformio run -t uploadfs`.
 
 > **Warning:** This is potentially dangerous and has not been tested much.
 > Use at your own risk.
@@ -46,9 +96,9 @@ To use this feature, place the compiled program in `data/tmcl.bin` and run the c
 > If the module is "stuck" after a failed download, cycle power
 > and try again.
 
-## API
+## Web API <div style="float:right"> [![Run in Postman](https://run.pstmn.io/button.png)](https://www.getpostman.com/run-collection/9dce439679000a723515#?env%5Besp8266-ap%5D=W3sia2V5IjoiaG9zdCIsInZhbHVlIjoiMTkyLjE2OC40LjEiLCJ0eXBlIjoidGV4dCIsImVuYWJsZWQiOnRydWV9XQ==") </div>
 
-The HTTP API endpoint is `http://<ip>/tmcl`. It supports two methods, `GET`
+The Web API endpoint is `http://<ip>/tmcl`. It supports two methods, `GET`
 and `POST`.
 
 ### Get Module Version
@@ -66,6 +116,7 @@ and `POST`.
 `POST /tmcl` will execute a TMCL instruction, specified as JSON object:
 
 ```
+POST /tmcl
 {
   "instruction": <instruction>,
   "type": <type>,
@@ -81,7 +132,7 @@ The response contains the TMCL reply as a JSON object:
 
 ```
 {
-  "status": <statu>,
+  "status": <status>,
   "instruction": <instruction>,
   "value": <value>
 }
@@ -97,13 +148,13 @@ In some cases, an HTTP error status will be sent:
 In addition, the TMCL reply `"status"` attribute might contain an error code
 (`100` means success).
 
-Please refer to the [TMCL Documentation][1] for information on available
- instructions and their parameters.
+Please refer to the [TMCL Documentation][TMCL] for information on available
+instructions and their parameters.
 
 ### Download TMCL Program
 
 `PUT /tmcl` will download a binary TMCL program to the module's EEPROM.
-Binary TMCL programs can be created using the [Trinamic TMCL-IDE][1].
+Binary TMCL programs can be created using the [Trinamic TMCL-IDE][TMCL].
 
 Use a `multipart/form-data` file upload to send the binary file.
 
@@ -174,4 +225,9 @@ Response:
 }
 ```
 
-[1]: http://www.trinamic.com/software-tools/tmcl-ide
+[TMCL]: http://www.trinamic.com/software-tools/tmcl-ide
+[Bower]: http://bower.io/
+[Gulp]: http://gulpjs.com/
+[nodejs]: http://nodejs.org/
+[PlatformIO]: http://platformio.org/
+[FNV1a]: https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
