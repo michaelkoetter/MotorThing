@@ -96,7 +96,9 @@ To use this feature, place the compiled program in `data/tmcl.bin` and run the c
 > If the module is "stuck" after a failed download, cycle power
 > and try again.
 
-## Web API <div style="float:right"> [![Run in Postman](https://run.pstmn.io/button.png)](https://www.getpostman.com/run-collection/9dce439679000a723515#?env%5Besp8266-ap%5D=W3sia2V5IjoiaG9zdCIsInZhbHVlIjoiMTkyLjE2OC40LjEiLCJ0eXBlIjoidGV4dCIsImVuYWJsZWQiOnRydWV9XQ==") </div>
+## Web API 
+
+[![Run in Postman](https://run.pstmn.io/button.png)](https://www.getpostman.com/run-collection/9dce439679000a723515#?env%5Besp8266-ap%5D=W3sia2V5IjoiaG9zdCIsInZhbHVlIjoiMTkyLjE2OC40LjEiLCJ0eXBlIjoidGV4dCIsImVuYWJsZWQiOnRydWV9XQ==")
 
 The Web API endpoint is `http://<ip>/tmcl`. It supports two methods, `GET`
 and `POST`.
