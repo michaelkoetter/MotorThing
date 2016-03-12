@@ -13,9 +13,10 @@ var RevAll      = require('gulp-rev-all');
 var Path        = require('path');
 var flatten     = require('gulp-flatten');
 var del         = require('del');
+var filter      = require('gulp-filter');
 
 var src = {
-  js: mainBowerFiles({includeSelf: true, filter: "**/*.js", debugging: true}),
+  js: mainBowerFiles({includeSelf: true, filter: "**/*.js"}),
   css: mainBowerFiles({includeSelf: true, filter: "**/*.css"}),
   html: mainBowerFiles({includeSelf: true, filter: "**/*.html"}),
   woff: mainBowerFiles({includeSelf: true, filter: "**/*.woff"}),
@@ -39,10 +40,15 @@ gulp.task('webserver', ['rev-all'], function() {
 });
 
 gulp.task('compress', ['rev-all'], function() {
+  // don't compress WOFF files (until the webserver recognizes them)
+  var f = filter(['**/*', '!**/*.woff'], {restore: true});
+
   return gulp.src('build/web-rev/**')
-  .pipe(gzip())
-  .pipe(gulp.dest('data/web'))
-  .pipe(hashsum({hash: 'md5', dest: 'data/web'}));
+    .pipe(f)
+    .pipe(gzip())
+    .pipe(f.restore)
+    .pipe(gulp.dest('data/web'))
+    .pipe(hashsum({hash: 'md5', dest: 'data/web'}));
 });
 
 gulp.task('rev-all', ['build'], function() {
