@@ -113,9 +113,7 @@ void TMCLInterface::send(TMCLTelegram* telegram)
   for (int i = 0; i < telegram->size(); i++)
     m_serial->write(telegram->data(i));
 
-
   // if there is garbage on the wire, flush it now
-  delay(1);
   m_serial->flush();
 }
 
