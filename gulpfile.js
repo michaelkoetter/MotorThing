@@ -33,12 +33,8 @@ gulp.task('webserver', ['rev-all'], function() {
 
   return gulp.src('build/web-rev')
     .pipe(webserver({
-      directoryListing: {
-        enable: true,
-        path: 'build/web-rev'
-      },
       livereload: true,
-      open: true
+      open: 'index.htm'
     }));
 });
 
