@@ -33,6 +33,10 @@ gulp.task('webserver', ['rev-all'], function() {
 
   return gulp.src('build/web-rev')
     .pipe(webserver({
+      directoryListing: {
+        enable: true,
+        path: 'build/web-rev'
+      },
       livereload: true,
       open: true
     }));
@@ -47,8 +51,10 @@ gulp.task('compress', ['rev-all'], function() {
 
 gulp.task('rev-all', ['build'], function() {
   var revAll = new RevAll({
-    dontRenameFile: ['index.html'],
     transformFilename: function(file, hash) {
+      if (file.path.endsWith('index.html'))
+        return 'index.htm';
+
       return hash.substr(0,16) + Path.extname(file.path);
     },
     transformPath: function(rev, source, path) {

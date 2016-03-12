@@ -8,7 +8,6 @@
 
 #include "TMCL.h"
 #include "TMCLRequestHandler.h"
-#include "FSRequestHandler.h"
 
 #define RS485_RO 13
 #define RS485_DI 14
@@ -34,7 +33,6 @@ const char* httpHeaders[HTTP_HEADERS_SIZE] {
 };
 
 TMCLRequestHandler tmclRequestHandler("/tmcl", &tmclInterface);
-FSRequestHandler fsRequestHandler(SPIFFS, "/", "/web", true, true);
 
 void setup() {
   Serial.begin(115200);
@@ -50,8 +48,7 @@ void setup() {
 
   if (SPIFFS.begin()) {
     Serial.print("SPIFFS mounted. \n");
-    fsRequestHandler.setDebug(&Serial);
-    http.addHandler(&fsRequestHandler);
+    http.serveStatic("/", SPIFFS, "/web/", "max-age=31556926");
 
     if (SPIFFS.exists(TMCL_INIT_FILE)) {
       Serial.printf("Found '%s', starting TMCL download... \n", TMCL_INIT_FILE);
