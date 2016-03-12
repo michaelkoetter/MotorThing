@@ -35,7 +35,21 @@ gulp.task('webserver', ['rev-all'], function() {
   return gulp.src('build/web-rev')
     .pipe(webserver({
       livereload: true,
-      open: 'index.htm'
+      //open: 'index.htm',
+      middleware: [
+        function(req, res, next) {
+          //gutil.log(req, res);
+          if (req.url == '/tmcl') {
+            if (req.method == 'GET') {
+              res.end(JSON.stringify({version: 'SIMULATION'}))
+            } else if (req.method == 'POST') {
+              res.end(JSON.stringify({status: 100}))
+            }
+          } else {
+            next();
+          }
+        }
+      ]
     }));
 });
 
