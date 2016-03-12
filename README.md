@@ -50,9 +50,10 @@ Building the webapp requires multiple steps.
 
 - First Source files from `src/web` and their dependencies are concatenated
 (JavaScript and CSS) and minified.
-- Then, a short filename is derived using a [FNV1a] hash.
+- Then, unique short filenames are derived using a content hash.
 This is necessary to work around the 32-character limit for filenames in the
-embedded SPIFFS filesystem.
+embedded SPIFFS filesystem, and also has the advantage that these files can
+be cached forever.
 - The resulting files are compressed using gzip to save space
 - Finally, the SPIFFS filesystem is built and uploaded to the ESP8266.
 
@@ -75,7 +76,8 @@ gulp
 platformio run -t uploadfs
 
 # You can also test the webapp in a local browser
-# Install the LiveReload browser extension and run "gulp" to rebuild/reload automatically
+# Install the LiveReload browser extension rebuild/reload automatically when
+# files in src/web are edited.
 gulp webserver
 ```
 
