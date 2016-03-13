@@ -15,7 +15,7 @@
   "private": true,
   "dependencies": {
     "riot": "^2.3.16",
-    "Phonon-Framework": "https://github.com/quark-dev/Phonon-Framework.git#=1.1.9"
+    "Phonon-Framework": "https://github.com/quark-dev/Phonon-Framework.git#^1.2.2"
   },
   "overrides": {
     "Phonon-Framework": {
