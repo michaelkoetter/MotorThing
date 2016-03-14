@@ -57,22 +57,15 @@ be cached forever.
 - The resulting files are compressed using gzip to save space
 - Finally, the SPIFFS filesystem is built and uploaded to the ESP8266.
 
-The build process uses [Bower] and [Gulp], so you will need to install these first
+The build process uses [Bower] and [Gulp], so you will need to install them once
 (and [node.js/npm][nodejs] if it is not installed already).
 
 ```bash
-# Install bower and gulp CLIs
+# Install Bower and Gulp CLIs - This needs to be done only once
 npm install -g bower
 npm install -g gulp-cli
 
-# Install the projects dependencies:
-npm install
-bower install
-
-# Build everything
-gulp
-
-# Upload it to the ESP8266
+# Build everything & Upload it to the ESP8266
 platformio run -t uploadfs
 
 # You can also test the webapp in a local browser
