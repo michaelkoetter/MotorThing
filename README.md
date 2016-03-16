@@ -19,10 +19,7 @@ To connect to the TMCL module, an RS-485 transceiver (MAX3485 or similar) is
 used. This transceiver needs three GPIO pins, so make sure your ESP8266 has
 them.
 
-For development, the _nodeMCU v2_ board is a good choice.
-
 ![Transceiver Connection](doc/transceiver.png?raw=true)
-
 
 ## Building the Firmware
 
@@ -74,9 +71,8 @@ platformio run -t uploadfs
 gulp webserver
 ```
 
-> The goal is to fit a usable web app in a 64k filesystem, so it can work even
-> on the cheapest ESP8266s. If you have a board with 4M flash, the filesystem
-> can be much bigger (up to 3M).
+> We are currently builing a 512k SPIFFS filesystem, which means you need
+> at least 1M flash on your ESP8266 module.
 
 ## Automatically Download TMCL Program
 
