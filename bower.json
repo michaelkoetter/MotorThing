@@ -6,11 +6,10 @@
   ],
   "description": "WiFi-enabled Motion Control",
   "main": [
-    "src/web/js/*.js",
-    "src/web/css/*.css",
-    "src/web/*.html",
-    "src/web/**/*.html",
-    "src/web/**/*.tag"
+    "src/web/**/*.js",
+    "src/web/**/*.css",
+    "src/web/index.html",
+    "src/web/**/*.html"
   ],
   "private": true,
   "dependencies": {

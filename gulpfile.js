@@ -89,8 +89,8 @@ gulp.task('build', ['js-all', 'css-all', 'html-all', 'fonts-all']);
 
 // Concatenate & minify all JavaScript source files
 gulp.task('js-all', ['clean'], function() {
-  return gulp.src(src.js)
-    .pipe(concat('app.js'))
+  return gulp.src(src.js, {base: 'src/web'})
+    .pipe(concat('app.min.js'))
     .pipe(uglify())
     .pipe(gulp.dest('build/web/js'));
 });
@@ -98,20 +98,14 @@ gulp.task('js-all', ['clean'], function() {
 // Concatenate & minify all CSS source files
 gulp.task('css-all', ['clean'], function() {
   return gulp.src(src.css)
-    .pipe(concat('app.css'))
+    .pipe(concat('app.min.css'))
     .pipe(cssnano())
     .pipe(gulp.dest('build/web/css'));
 });
 
 // Concatenate & minify all HTML source files
 gulp.task('html-all', ['clean'], function() {
-  return gulp.src(src.html, {base: 'src/web'})
-    .pipe(htmlmin({
-      // this seems to be all we can do without breaking Riot tag syntax
-      removeComments: true,
-      minifyCSS: true,
-      minifyURLs: true,
-    }))
+  return gulp.src(src.html)
     .pipe(gulp.dest('build/web'));
 });
 

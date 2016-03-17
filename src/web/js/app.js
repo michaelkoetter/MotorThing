@@ -14,6 +14,7 @@
 
   app.on({page: 'home', preventClose: true, content: null});
   app.on({page: 'velocity', preventClose: false, content: null});
+  app.on({page: 'timelapse', preventClose: false, content: null});
 
   app.start();
 })();
