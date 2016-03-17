@@ -105,7 +105,7 @@ gulp.task('css-all', ['clean'], function() {
 
 // Concatenate & minify all HTML source files
 gulp.task('html-all', ['clean'], function() {
-  return gulp.src(src.html)
+  return gulp.src(src.html, {base: 'src/web'})
     .pipe(gulp.dest('build/web'));
 });
 
