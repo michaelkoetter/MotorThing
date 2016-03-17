@@ -18,7 +18,8 @@ var filter      = require('gulp-filter');
 var src = {
   js: mainBowerFiles({includeSelf: true, filter: "**/*.js"}),
   css: mainBowerFiles({includeSelf: true, filter: "**/*.css"}),
-  html: mainBowerFiles({includeSelf: true, filter: "**/*.html"}),
+  html: mainBowerFiles({includeSelf: true, filter: ["**/*.html", "!**/tags/**"]}),
+  riotTags: mainBowerFiles({includeSelf: true, filter: "**/tags/**"}),
   woff: mainBowerFiles({includeSelf: true, filter: "**/*.woff"}),
   all: mainBowerFiles({includeSelf: true}),
 }
@@ -85,7 +86,7 @@ gulp.task('rev-all', ['build'], function() {
 
 })
 
-gulp.task('build', ['js-all', 'css-all', 'html-all', 'fonts-all']);
+gulp.task('build', ['js-all', 'css-all', 'html-all', 'riot-all', 'fonts-all']);
 
 // Concatenate & minify all JavaScript source files
 gulp.task('js-all', ['clean'], function() {
@@ -108,6 +109,12 @@ gulp.task('html-all', ['clean'], function() {
   return gulp.src(src.html, {base: 'src/web'})
     .pipe(gulp.dest('build/web'));
 });
+
+gulp.task('riot-all', ['clean'], function() {
+  return gulp.src(src.riotTags)
+    .pipe(concat('tags.html'))
+    .pipe(gulp.dest('build/web'));
+})
 
 // Copy fonts
 gulp.task('fonts-all', ['clean'], function() {
