@@ -114,7 +114,7 @@ gulp.task('css-all', ['clean'], () => {
     .pipe(sourcemaps.init())
     .pipe(concat('app.min.css'))
     .pipe(cssnano())
-    .pipe(sourcemaps.write())
+    .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest('build/web/css'));
 });
 
