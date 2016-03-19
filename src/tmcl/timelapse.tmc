@@ -34,12 +34,12 @@ LoopStartTicks      = 22
 //////////////////////////////////////////////////////////////////////////////
 // Set Variables - TODO these should be set by the MCU later
 //////////////////////////////////////////////////////////////////////////////
-SGP   StartPosition,    2,  0
-SGP   EndPosition,      2,  100000
-SGP   Shots,            2,  10
-SGP   IntervalTicks,    2,  1000
-SGP   StabilizeTicks,   2,  500
-SGP   ShootTicks,       2,  100
+// SGP   StartPosition,    2,  0
+// SGP   EndPosition,      2,  100000
+// SGP   Shots,            2,  10
+// SGP   IntervalTicks,    2,  1000
+// SGP   StabilizeTicks,   2,  500
+// SGP   ShootTicks,       2,  100
 
 Setup:
   SAP   138, 0, 0             //set ramp mode (position)

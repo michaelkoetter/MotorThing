@@ -15,7 +15,9 @@
   "private": true,
   "dependencies": {
     "riot": "^2.3.16",
-    "Phonon-Framework": "https://github.com/michaelkoetter/Phonon-Framework.git#fix-riot-tabs"
+    "Phonon-Framework": "https://github.com/michaelkoetter/Phonon-Framework.git#fix-riot-tabs",
+    "moment": "^2.12.0",
+    "moment-duration-format": "^1.3.0"
   },
   "overrides": {
     "Phonon-Framework": {
