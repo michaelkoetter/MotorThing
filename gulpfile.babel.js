@@ -14,6 +14,7 @@ import hashsum from 'gulp-hashsum';
 import flatten from 'gulp-flatten';
 import filter from 'gulp-filter';
 import riot from 'gulp-riot';
+import eslint from 'gulp-eslint';
 
 import del from 'del';
 import Path from 'path';
@@ -22,8 +23,8 @@ import mainBowerFiles from 'main-bower-files';
 const src = {
   js: mainBowerFiles({ includeSelf: true, filter: "**/*.js" }),
   css: mainBowerFiles({ includeSelf: true, filter: "**/*.css" }),
-  html: mainBowerFiles({ includeSelf: true, filter: "**/*.html" }),
-  riotTags: mainBowerFiles({ includeSelf: true, filter: "**/*.tag" }),
+  html: mainBowerFiles({ includeSelf: true, filter: ["**/*.html", "!**/tags/*.html"] }),
+  riotTags: mainBowerFiles({ includeSelf: true, filter: "**/tags/*.html" }),
   woff: mainBowerFiles({ includeSelf: true, filter: "**/*.woff" }),
   all: mainBowerFiles({ includeSelf: true }),
 }
@@ -97,6 +98,9 @@ gulp.task('build', ['js-all', 'css-all', 'html-all', 'riot-all', 'fonts-all']);
 // Concatenate & minify all JavaScript source files
 gulp.task('js-all', ['clean'], () => {
   return gulp.src(src.js, {base: 'src/web'})
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failOnError())
     .pipe(sourcemaps.init())
     .pipe(babel({
       presets: ['es2015'],
@@ -121,11 +125,17 @@ gulp.task('css-all', ['clean'], () => {
 // Concatenate & minify all HTML source files
 gulp.task('html-all', ['clean'], () => {
   return gulp.src(src.html, {base: 'src/web'})
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failOnError())
     .pipe(gulp.dest('build/web'));
 });
 
 gulp.task('riot-all', ['clean'], () => {
   return gulp.src(src.riotTags)
+  .pipe(eslint())
+  .pipe(eslint.format())
+  .pipe(eslint.failOnError())
     .pipe(sourcemaps.init())
     .pipe(riot({ type: 'none' }))
     .pipe(babel({ presets: ['es2015'] }))
