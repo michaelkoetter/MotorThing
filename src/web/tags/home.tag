@@ -19,7 +19,7 @@
     </div>
 
     <script>
-        self = this;
+        let self = this;
         this.loading = true;
 
         this.on('create', function() {

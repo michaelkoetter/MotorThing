@@ -9,7 +9,8 @@
     "src/web/**/*.js",
     "src/web/**/*.css",
     "src/web/index.html",
-    "src/web/**/*.html"
+    "src/web/**/*.html",
+    "src/web/**/*.tag"
   ],
   "private": true,
   "dependencies": {

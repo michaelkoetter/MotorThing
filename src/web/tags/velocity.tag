@@ -40,21 +40,21 @@
     </div>
 
     <script>
-        var self = this;
+        let self = this;
         this.model = {
           speed: 100,
           direction: 'left'
         }
 
-        input(e) {
+        this.input = (e) => {
           this.model[e.target.name] = e.target.value;
         }
 
-        start() {
+        this.start = () => {
           tmcl.rotate(this.model.direction, parseInt(this.model.speed));
         }
 
-        stop() {
+        this.stop = () => {
           tmcl.stop();
         }
     </script>

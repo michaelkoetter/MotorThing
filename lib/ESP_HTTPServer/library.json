@@ -1,0 +1,14 @@
+{
+    "name": "ESP_HTTPServer",
+    "keywords": [
+      "esp8266", "http", "server"
+    ],
+    "description": "A fast and robust HTTP server for the ESP8266 MCU",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/michaelkoetter/ESP_HTTPServer"
+    },
+    "frameworks": "arduino",
+    "platforms": "espressif"
+}
