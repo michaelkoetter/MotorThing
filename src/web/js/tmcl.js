@@ -4,7 +4,7 @@ let options = {
   url: 'tmcl'
 };
 
-let defaultSuccessHandler = (res) => {
+let defaultSuccessHandler = () => {
 };
 
 let defaultErrorHandler = (res, error) => {
@@ -17,7 +17,7 @@ export function getModuleInfo(success, error) {
   success = success || defaultSuccessHandler
   error = error || defaultErrorHandler
 
-  var req = phonon.ajax({
+  phonon.ajax({
     method: 'GET',
     url: options.url,
     dataType: 'json',
@@ -35,7 +35,7 @@ export function sendInstruction(instruction, success, error) {
   error = error || defaultErrorHandler
   console.log('> TMCL instruction', instruction)
 
-  var req = phonon.ajax({
+  phonon.ajax({
     method: 'POST',
     url: options.url,
     contentType: 'application/json',

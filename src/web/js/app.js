@@ -1,13 +1,11 @@
 
 import phonon from 'phonon';
 
-import quantity from '../tags/timelapse-quantity.html';
-import time from '../tags/timelapse-time.html';
+// eslint-disable-next-line no-unused-vars
+import tags from '../tags';
 
-// import the top-level Riot tags (pages)
-import home from'../tags/home.html';
-import velocity from'../tags/velocity.html';
-import timelapse from'../tags/timelapse.html';
+// eslint-disable-next-line no-unused-vars
+import momentDurationFormat from 'moment-duration-format';
 
 phonon.options({
     navigator: {
