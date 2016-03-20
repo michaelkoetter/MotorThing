@@ -40,6 +40,10 @@
   </div>
 
   <script>
+    import momentDurationFormat from 'moment-duration-format';
+    import moment from 'moment';
+    import { startTimelapse, stopProgram } from '../js/tmcl';
+
     let self = this;
 
     this.durations = {
@@ -60,12 +64,12 @@
     this.start = (e) => {
       let interval = moment.duration(parseFloat(this.interval.value), 'seconds');
       let exposure = moment.duration(parseFloat(this.exposure.value), 'seconds');
-      tmcl.startTimelapse(undefined, undefined,
+      startTimelapse(undefined, undefined,
           this.shots, interval.asMilliseconds(), 0, exposure.asMilliseconds());
     }
 
     this.stop = (e) => {
-      tmcl.stopProgram();
+      stopProgram();
     }
 
     this.on('update', () => {

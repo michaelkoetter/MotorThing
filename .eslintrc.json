@@ -2,16 +2,14 @@
   "extends": "eslint:recommended",
   "plugins": ["eslint-plugin-html"],
   "parserOptions": {
-    "ecmaVersion": 6
+    "ecmaVersion": 6,
+    "sourceType": "module"
   },
   "env": {
-    "browser": true
+    "browser": true,
+    "es6": true
   },
   "globals": {
-    "tmcl": true,
-    "phonon": false,
-    "riot": false,
-    "moment": false
   },
   "rules": {
     "no-unused-vars": "warn",

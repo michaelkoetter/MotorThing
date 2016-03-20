@@ -19,11 +19,14 @@
     </div>
 
     <script>
+        import { getModuleInfo } from '../js/tmcl';
+        import phonon from 'phonon';
+        
         let self = this;
         this.loading = true;
 
         this.on('create', function() {
-          tmcl.getModuleInfo(function(res) {
+          getModuleInfo(function(res) {
               console.log(res);
               self.module = res;
               self.loading = false;

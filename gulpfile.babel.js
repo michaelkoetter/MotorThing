@@ -1,8 +1,6 @@
 'use strict';
 import gulp from 'gulp';
 import gutil from 'gulp-util';
-import clean from 'gulp-clean';
-import babel from 'gulp-babel';
 import concat from 'gulp-concat';
 import sourcemaps from 'gulp-sourcemaps';
 import uglify from 'gulp-uglify';
@@ -13,20 +11,19 @@ import RevAll from 'gulp-rev-all';
 import hashsum from 'gulp-hashsum';
 import flatten from 'gulp-flatten';
 import filter from 'gulp-filter';
-import riot from 'gulp-riot';
 import eslint from 'gulp-eslint';
+import browserify from 'browserify'
+import source from 'vinyl-source-stream';
+import buffer from 'vinyl-buffer';
 
 import del from 'del';
 import Path from 'path';
 import mainBowerFiles from 'main-bower-files';
 
 const src = {
-  js: mainBowerFiles({ includeSelf: true, filter: "**/*.js" }),
   css: mainBowerFiles({ includeSelf: true, filter: "**/*.css" }),
   html: mainBowerFiles({ includeSelf: true, filter: ["**/*.html", "!**/tags/*.html"] }),
-  riotTags: mainBowerFiles({ includeSelf: true, filter: "**/tags/*.html" }),
-  woff: mainBowerFiles({ includeSelf: true, filter: "**/*.woff" }),
-  all: mainBowerFiles({ includeSelf: true }),
+  woff: mainBowerFiles({ includeSelf: true, filter: "**/*.woff" })
 }
 
 gulp.task('default', ['compress']);
@@ -83,7 +80,7 @@ gulp.task('rev-all', ['build'], () => {
     },
     transformPath: function(rev, source, path) {
       return Path.basename(rev);
-    },
+    }
   });
 
   return gulp.src('build/web/**')
@@ -93,57 +90,46 @@ gulp.task('rev-all', ['build'], () => {
 
 })
 
-gulp.task('build', ['js-all', 'css-all', 'html-all', 'riot-all', 'fonts-all']);
+gulp.task('build', ['js-all', 'css-all', 'html-all', 'fonts-all']);
 
 // Concatenate & minify all JavaScript source files
-gulp.task('js-all', ['clean'], () => {
-  return gulp.src(src.js, {base: 'src/web'})
+gulp.task('js-all', ['clean', 'js-lint'], () => {
+  let b = browserify({
+    entries: 'src/web/js/app.js',
+    debug: true
+  });
+
+  return b.bundle()
+    .pipe(source('app.js'))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(uglify())
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest('build/web/js'));
+});
+
+gulp.task('js-lint', () => {
+  return gulp.src(['src/web/**/*.js', 'src/web/tags/*.html'])
     .pipe(eslint())
     .pipe(eslint.format())
-    .pipe(eslint.failOnError())
-    .pipe(sourcemaps.init())
-    .pipe(babel({
-      presets: ['es2015'],
-      only: 'src/web/**/*.js'
-    }))
-    .pipe(concat('app.min.js'))
-    .pipe(uglify())
-    .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest('build/web/js'));
+    .pipe(eslint.failOnError());
 });
 
 // Concatenate & minify all CSS source files
 gulp.task('css-all', ['clean'], () => {
   return gulp.src(src.css)
     .pipe(sourcemaps.init())
-    .pipe(concat('app.min.css'))
+    .pipe(concat('app.css'))
     .pipe(cssnano())
-    .pipe(sourcemaps.write('.'))
+    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest('build/web/css'));
 });
 
-// Concatenate & minify all HTML source files
+// Copy all HTML source files
 gulp.task('html-all', ['clean'], () => {
   return gulp.src(src.html, {base: 'src/web'})
-    .pipe(eslint())
-    .pipe(eslint.format())
-    .pipe(eslint.failOnError())
     .pipe(gulp.dest('build/web'));
 });
-
-gulp.task('riot-all', ['clean'], () => {
-  return gulp.src(src.riotTags)
-  .pipe(eslint())
-  .pipe(eslint.format())
-  .pipe(eslint.failOnError())
-    .pipe(sourcemaps.init())
-    .pipe(riot({ type: 'none' }))
-    .pipe(babel({ presets: ['es2015'] }))
-    .pipe(concat('tags.min.js'))
-    .pipe(uglify())
-    .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest('build/web/js'));
-})
 
 // Copy fonts
 gulp.task('fonts-all', ['clean'], () => {
