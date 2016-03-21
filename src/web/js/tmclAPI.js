@@ -17,7 +17,6 @@ const TMCL_STORE_GLOBAL_PARAMETER = 11 // eslint-disable-line no-unused-vars
 const TMCL_RESTORE_GLOBAL_PARAMETER = 12 // eslint-disable-line no-unused-vars
 
 // TMCL Control Functions
-const TMCL_STOP_APPLICATION = 128 // eslint-disable-line no-unused-vars
 const TMCL_START_APPLICATION = 129 // eslint-disable-line no-unused-vars
 const TMCL_RESET_APPLICATION = 131 // eslint-disable-line no-unused-vars
 const TMCL_GET_APPLICATION_STATUS = 135 // eslint-disable-line no-unused-vars
@@ -138,6 +137,6 @@ export function startApplication(address = 0) {
 
 export function stopApplication() {
   sendInstruction({
-    instruction: TMCL_STOP_APPLICATION
+    instruction: TMCL_RESET_APPLICATION
   })(store.dispatch)
 }
