@@ -16,7 +16,13 @@ function modules(state = [], action) {
   return state
 }
 
-function tmcl(state = {}, action) {
+function tmcl(state = {
+                pending: [],
+                errors: [],
+                replies: [],
+                modules: []
+              }, action) {
+
   switch (action.type) {
     case actions.INSTRUCTION_REQUEST:
       return Object.assign({}, state, {
@@ -49,15 +55,9 @@ function tmcl(state = {}, action) {
       return Object.assign({}, state, {
         errors: []
       })
-      
+
     default:
-      // initial state
-      return {
-        pending: [],
-        errors: [],
-        replies: [],
-        modules: []
-      };
+      return state;
   }
 }
 

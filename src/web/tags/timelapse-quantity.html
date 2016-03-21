@@ -2,82 +2,62 @@
   <div class="padded-full">
       <div class="input-wrapper">
         <input class="with-label" type="number" step="1" min="1" name="shots"
-            oninput="{ update }">
+            oninput="{ setShotsAndInterval }" value="{ Math.round(state().timelapse.shots) }">
         <label class="floating-label" for="speed">Number of shots</label>
       </div>
       <div class="input-wrapper">
-        <input class="with-label" type="number" step="0.1" min="0.1" name="interval"
-            oninput="{ update }">
-        <label class="floating-label" for="speed">Interval (s)</label>
+        <input class="with-label" type="time" step="0.100" min="0.100" name="interval"
+            oninput="{ setShotsAndInterval }"
+            value="{ state().timelapse.interval.format('hh:mm:ss.SSS', { trim: false }) }">
+        <label class="floating-label" for="speed">Interval</label>
       </div>
       <div class="input-wrapper">
-        <input class="with-label" type="number" step="0.1" min="0" name="exposure"
-            oninput="{ update }">
-        <label class="floating-label" for="speed">Exposure (s)</label>
+        <input class="with-label" type="time" step="0.100" min="0.000" name="exposure"
+        oninput="{ parent.setExposure }"
+        value="{ state().timelapse.exposure.format('hh:mm:ss.SSS', { trim: false }) }">
+        <label class="floating-label" for="speed">Exposure</label>
       </div>
 
-      <table class="table padded-top">
+      <table class="table padded-top" style="width: 100%">
         <tr>
           <thead>
             <th>Time</th>
-            <th each="{ fps in durations }">{ fps }fps</th>
+            <th each="{ fps, i in parent.fps }">{ fps }fps</th>
           </thead>
         </tr>
         <tbody>
           <tr>
               <td>
-                { duration.format('h[h] m[m] s[s]') }
+                { state().timelapse.time.format('h[h] m[m] s[s]') }
               </td>
-              <td each="{ fps, duration in durations }">
-                { duration.format('h[h] m[m] s[s]') }
+              <td each="{ fps, i in parent.fps }">
+                { parent.parent.durationAt(fps).format('h[h] m[m] s[s]') }
               </td>
           </tr>
         </tbody>
       </table>
 
-      <button class="btn fit-parent primary padded-top" onclick="{ start }">Start</button>
-      <button class="btn fit-parent negative padded-top" onclick="{ stop }">Stop</button>
+      <button class="btn fit-parent primary padded-top"
+        disabled="{ state().tmcl.pending.length > 0 }"
+        onclick="{ parent.start }">Start</button>
+
+      <button class="btn fit-parent negative padded-top" onclick="{ parent.stop }">Stop</button>
   </div>
 
   <script>
     import moment from 'moment';
-    import { setupTimelapse, startTimelapse, stopTimelapse } from '../js/timelapseAPI'
-    
-    this.durations = {
-      24: 0,
-      25: 0,
-      30: 0
+    import { setShotsAndInterval } from '../js/actions/timelapse'
+
+    this.setShotsAndInterval = () => {
+      let shots = parseInt(this.shots.value)
+      let interval = moment.duration(this.interval.value)
+      this.store.dispatch(setShotsAndInterval(shots, interval))
     }
 
-    this.updateDurations = () => {
-      this.duration = moment.duration(this.shots.value * this.interval.value, 'seconds');
-      for (let fps in this.durations) {
-        this.durations[fps] = moment.duration(1 / fps * this.shots.value, 'seconds');
-      }
-    }
-
-    this.start = () => {
-      let interval = moment.duration(parseFloat(this.interval.value), 'seconds');
-      let exposure = moment.duration(parseFloat(this.exposure.value), 'seconds');
-      setupTimelapse(undefined, undefined,
-          parseInt(this.shots.value), interval.asMilliseconds(), 0, exposure.asMilliseconds())
-      startTimelapse()
-    }
-
-    this.stop = () => {
-      stopTimelapse()
-    }
-
-    this.on('update', () => {
-      this.updateDurations();
-    });
+    this.store.on('change', () => this.update())
 
     this.on('mount', () => {
-      this.shots.value = 100;
-      this.interval.value = 1;
-      this.exposure.value = 0.1;
-
-      this.update();
+      this.exposure.value = '00:00:00.100';
     });
   </script>
 

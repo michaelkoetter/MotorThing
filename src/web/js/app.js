@@ -29,7 +29,8 @@ let globalMixin = {
 }
 riot.mixin(globalMixin)
 
-riot.mount('*')
+// manually mount top-level tags that are not pages
+riot.mount('tmcl-notification')
 
 let app = phonon.navigator();
 app.start();
