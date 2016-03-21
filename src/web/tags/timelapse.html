@@ -20,4 +20,33 @@
           <timelapse-time />
       </div>
   </div>
+
+  <script>
+    import moment from 'moment'
+    import { setExposure } from '../js/actions/timelapse'
+    import { startTimelapse, stopTimelapse } from '../js/timelapseAPI'
+
+    // TODO make this configurable
+    this.fps = [
+      24, 25, 30
+    ]
+
+    this.durationAt = (fps) => {
+      let shots = this.state().timelapse.shots;
+      return moment.duration(1 / fps * shots, 'seconds')
+    }
+
+    this.start = () => {
+      startTimelapse()
+    }
+
+    this.stop = () => {
+      stopTimelapse()
+    }
+
+    this.setExposure = (e) => {
+      let exposure = moment.duration(e.target.value)
+      this.store.dispatch(setExposure(exposure))
+    }
+  </script>
 </timelapse>

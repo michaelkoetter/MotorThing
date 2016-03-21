@@ -40,7 +40,7 @@
     </div>
 
     <script>
-        import { rotate, stop } from '../js/tmcl';
+        import { rotate, stop } from '../js/tmclAPI';
 
         this.model = {
           speed: 100,
@@ -52,11 +52,11 @@
         }
 
         this.start = () => {
-          rotate(this.model.direction, parseInt(this.model.speed));
+          rotate(this.model.direction, parseInt(this.model.speed))
         }
 
         this.stop = () => {
-          stop();
+          stop()
         }
     </script>
 </velocity>
