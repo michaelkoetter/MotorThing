@@ -5,40 +5,19 @@
         </div>
     </header>
     <div class="content">
-
-        <ul class="list" if="{module}">
-            <li class="divider">Module: { module.version }</li>
+        <ul class="list" each={ store.getState().tmcl.modules }>
+            <li class="divider">Module: { version }</li>
             <li><a class="padded-list" href="#!velocity">Velocity Mode</a></li>
             <li><a class="padded-list" href="#!timelapse">Timelapse</a></li>
         </ul>
-        <div class="content padded-full" if="{loading}">
-          <div class="circle-progress active">
-              <div class="spinner"></div>
-          </div>
-        </div>
     </div>
 
     <script>
-        import { getModuleInfo } from '../js/tmcl';
-        import phonon from 'phonon';
-        
-        let self = this;
-        this.loading = true;
+        import { getModuleInfo } from '../js/tmcl'
 
-        this.on('create', function() {
-          getModuleInfo(function(res) {
-              console.log(res);
-              self.module = res;
-              self.loading = false;
-              self.update();
-            }, function(res, error) {
-              console.error(error);
-              console.log(res);
-              self.loading = false;
-              self.update();
-              phonon.alert('Could not connect to TMCL module.',
-                'TMCL error', false, 'Close');
-            });
+        this.store.on('change', () => this.update())
+        this.on('create', () => {
+          this.store.dispatch(getModuleInfo())
         });
     </script>
 </home>

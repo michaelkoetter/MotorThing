@@ -43,11 +43,15 @@ gulp.task('webserver', ['rev-all'], () => {
         function(req, res, next) {
           //gutil.log(req, res);
           if (req.url == '/tmcl') {
-            if (req.method == 'GET') {
-              res.end(JSON.stringify({version: 'SIMULATION'}))
-            } else if (req.method == 'POST') {
-              res.end(JSON.stringify({status: 100}))
-            }
+            setTimeout(() => {
+              if (req.method == 'GET') {
+                res.end(JSON.stringify({version: 'SIMULATION'}))
+              } else if (req.method == 'POST') {
+                res.end(JSON.stringify({status: 100}))
+              } else {
+                res.end()
+              }
+            }, 200) // delay response by 200ms to simulate slow WiFi
           } else {
             next();
           }
@@ -100,6 +104,8 @@ gulp.task('js-all', ['clean', 'js-lint'], () => {
     entries: './src/web/js/app.js',
     debug: true
   });
+
+  b.transform('loose-envify', { NODE_ENV: 'production', global: true });
 
   return b.bundle()
     .pipe(source('app.js'))
