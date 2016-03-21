@@ -40,7 +40,7 @@
     </div>
 
     <script>
-        import { sendInstructions, rotate, stop } from '../js/tmcl';
+        import { rotate, stop } from '../js/tmclAPI';
 
         this.model = {
           speed: 100,
@@ -52,14 +52,11 @@
         }
 
         this.start = () => {
-          this.store.dispatch(
-            sendInstructions([
-              rotate(this.model.direction, parseInt(this.model.speed))
-            ]))
+          rotate(this.model.direction, parseInt(this.model.speed))
         }
 
         this.stop = () => {
-          this.store.dispatch(sendInstructions([ stop() ]));
+          stop()
         }
     </script>
 </velocity>

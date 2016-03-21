@@ -1,10 +1,8 @@
 
 import phonon from 'phonon'
 import riot from 'riot'
-// eslint-disable-next-line no-unused-vars
-import momentDurationFormat from 'moment-duration-format'
-// eslint-disable-next-line no-unused-vars
-import tags from '../tags'
+import momentDurationFormat from 'moment-duration-format' // eslint-disable-line no-unused-vars
+import tags from '../tags' // eslint-disable-line no-unused-vars
 
 import store from './store'
 
@@ -18,9 +16,20 @@ phonon.options({
     i18n: null
 });
 
-// make the Redux store available to all tags as a mixin
-let storeMixin = { store }
-riot.mixin(storeMixin)
+let globalMixin = {
+  // make the Redux store available to all tags as a mixin
+  store,
+
+  // make the current state available to all tags as a mixin
+  // this enables shorter expressions like { state().property }
+  // instead of { store.getState().property }
+  get state() {
+    return () => store.getState()
+  }
+}
+riot.mixin(globalMixin)
+
+riot.mount('*')
 
 let app = phonon.navigator();
 app.start();

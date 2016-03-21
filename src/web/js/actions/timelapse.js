@@ -1,0 +1,6 @@
+// Action Types
+export const TIMELAPSE_SET_SHOTS = 'TIMELAPSE_SET_SHOTS'
+export const TIMELAPSE_SET_TIME = 'TIMELAPSE_SET_TIME'
+export const TIMELAPSE_SET_INTERVAL = 'TIMELAPSE_SET_INTERVAL'
+
+// Action Creators

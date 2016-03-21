@@ -41,8 +41,8 @@
 
   <script>
     import moment from 'moment';
-    import { sendInstructions, startTimelapse, stopApplication } from '../js/tmcl';
-
+    import { setupTimelapse, startTimelapse, stopTimelapse } from '../js/timelapseAPI'
+    
     this.durations = {
       24: 0,
       25: 0,
@@ -59,14 +59,13 @@
     this.start = () => {
       let interval = moment.duration(parseFloat(this.interval.value), 'seconds');
       let exposure = moment.duration(parseFloat(this.exposure.value), 'seconds');
-      this.store.dispatch(sendInstructions(
-        startTimelapse(undefined, undefined,
+      setupTimelapse(undefined, undefined,
           parseInt(this.shots.value), interval.asMilliseconds(), 0, exposure.asMilliseconds())
-        ))
+      startTimelapse()
     }
 
     this.stop = () => {
-      this.store.dispatch(sendInstructions([ stopApplication() ]))
+      stopTimelapse()
     }
 
     this.on('update', () => {

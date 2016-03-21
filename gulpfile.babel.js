@@ -21,7 +21,10 @@ import del from 'del';
 import Path from 'path';
 
 const src = {
-  css: ['./node_modules/Phonon-Framework/dist/css/phonon.css'],
+  css: [
+    './node_modules/Phonon-Framework/dist/css/phonon.css',
+    './src/web/css/*.css'
+  ],
   html: ['./src/web/index.html'],
   fonts: ['./node_modules/Phonon-Framework/dist/fonts/*.woff']
 }

@@ -5,19 +5,19 @@
         </div>
     </header>
     <div class="content">
-        <ul class="list" each={ store.getState().tmcl.modules }>
-            <li class="divider">Module: { version }</li>
+        <ul class="list" each={ state().tmcl.modules }>
+            <li class="divider">Module { address }: { version }</li>
             <li><a class="padded-list" href="#!velocity">Velocity Mode</a></li>
             <li><a class="padded-list" href="#!timelapse">Timelapse</a></li>
         </ul>
     </div>
 
     <script>
-        import { getModuleInfo } from '../js/tmcl'
+        import { getModuleInfo } from '../js/tmclAPI'
 
         this.store.on('change', () => this.update())
         this.on('create', () => {
-          this.store.dispatch(getModuleInfo())
+          getModuleInfo()
         });
     </script>
 </home>

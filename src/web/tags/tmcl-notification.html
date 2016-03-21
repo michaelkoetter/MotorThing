@@ -1,0 +1,74 @@
+<tmcl-notification class="abc">
+  <div class="notification" id="tmcl-busy">
+    Sending Instructions ({ state().tmcl.pending.length } pending)...
+  </div>
+
+  <div class="notification error" id="tmcl-errors">
+    <div if={ !showAllErrors }>
+      { state().tmcl.errors[0].error }
+    </div>
+
+    <div if={ showAllErrors }>
+      <div each={ state().tmcl.errors }>{ error }</div>
+    </div>
+
+    <div>
+      &nbsp;
+
+      <button class="btn pull-right" onclick="{ dismissAllErrors }">
+        Dismiss<span if={state().tmcl.errors.length > 1}> All</span>
+      </button>
+
+      <button class="btn pull-right" onclick="{ toggleAllErrors }"
+        if={ !showAllErrors && state().tmcl.errors.length > 1 }>
+        { state().tmcl.errors.length - 1 } more...
+      </button>
+    </div>
+  </div>
+
+  <script>
+    import phonon from 'phonon'
+    import { dismissAllErrors } from '../js/actions/tmcl'
+
+    this.busy = false
+    this.errors = false
+    this.showAllErrors = false
+
+    this.dismissAllErrors = () => {
+      this.showAllErrors = false
+      this.store.dispatch(dismissAllErrors())
+    }
+
+    this.toggleAllErrors = () => {
+      this.showAllErrors = !this.showAllErrors
+    }
+
+    this.showNotifications = (busy, errors) => {
+      if (this.busy && !busy) {
+        this.busy = false
+        phonon.notif('#tmcl-busy').hide()
+      } else if (!this.busy && busy) {
+        this.busy = true
+        phonon.notif('#tmcl-busy').show()
+      }
+
+      if (this.errors && !errors) {
+        this.errors = false
+        phonon.notif('#tmcl-errors').hide()
+      } else if (!this.errors && errors) {
+        this.errors = true
+        phonon.notif('#tmcl-errors').show()
+      }
+    }
+
+    this.store.on('change', () => {
+      this.showNotifications(
+        this.state().tmcl.pending.length > 0,
+        this.state().tmcl.errors.length > 0
+      )
+
+      this.update()
+    })
+
+  </script>
+</tmcl-notification>
