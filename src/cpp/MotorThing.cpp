@@ -9,9 +9,9 @@
 #include "TMCL.h"
 #include "TMCLRequestHandler.h"
 
-#define RS485_RO 13
-#define RS485_DI 14
-#define RS485_DE 12
+#define RS485_RO D5
+#define RS485_DI D8
+#define RS485_DE D7
 #define RS485_SPEED 9600
 
 #define WIFI_SSID "motor-thing"
