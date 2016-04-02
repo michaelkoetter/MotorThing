@@ -1,22 +1,22 @@
 <timelapse-time>
   <div class="padded-full">
       <div class="input-wrapper">
-        <input class="with-label" type="time" step="1" min="1" name="time"
+        <input class="with-label" type="number" step="1" min="1" name="time"
             oninput="{ setTimeAndInterval }"
-            value="{ state().timelapse.time.format('hh:mm:ss', { trim: false }) }">
-        <label class="floating-label" for="speed">Time</label>
+            value="{ state().timelapse.time.asMinutes() }">
+        <label class="floating-label" for="time">Time (minutes)</label>
       </div>
       <div class="input-wrapper">
-        <input class="with-label" type="time" step="0.100" min="0.100" name="interval"
+        <input class="with-label" type="number" step="0.1" min="0.1" name="interval"
             oninput="{ setTimeAndInterval }"
-            value="{ state().timelapse.interval.format('hh:mm:ss.SSS', { trim: false }) }">
-        <label class="floating-label" for="speed">Interval</label>
+            value="{ state().timelapse.interval.asSeconds() }">
+        <label class="floating-label" for="interval">Interval (seconds)</label>
       </div>
       <div class="input-wrapper">
-        <input class="with-label" type="time" step="0.100" min="0.000" name="exposure"
-            oninput="{ parent.setExposure }"
-            value="{ state().timelapse.exposure.format('hh:mm:ss.SSS', { trim: false }) }">
-        <label class="floating-label" for="speed">Exposure</label>
+        <input class="with-label" type="number" step="0.1" min="0.0" name="exposure"
+        oninput="{ parent.setExposure }"
+        value="{ state().timelapse.exposure.asSeconds() }">
+        <label class="floating-label" for="exposure">Exposure (seconds)</label>
       </div>
 
       <table class="table padded-top" style="width: 100%">
@@ -41,7 +41,7 @@
       <button class="btn fit-parent primary padded-top"
         disabled="{ state().tmcl.pending.length > 0 }"
         onclick="{ parent.start }">Start</button>
-        
+
       <button class="btn fit-parent negative padded-top" onclick="{ parent.stop }">Stop</button>
   </div>
 
@@ -50,15 +50,12 @@
     import { setTimeAndInterval } from '../js/actions/timelapse'
 
     this.setTimeAndInterval = () => {
-      let time = moment.duration(this.time.value)
-      let interval = moment.duration(this.interval.value)
+      let time = moment.duration(parseInt(this.time.value), 'minutes')
+      let interval = moment.duration(parseFloat(this.interval.value), 'seconds')
       this.store.dispatch(setTimeAndInterval(time, interval))
     }
 
     this.store.on('change', () => this.update())
 
-    this.on('mount', () => {
-      this.exposure.value = '00:00:00.100';
-    });
   </script>
 </timelapse-time>

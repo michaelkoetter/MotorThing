@@ -45,7 +45,7 @@
     }
 
     this.setExposure = (e) => {
-      let exposure = moment.duration(e.target.value)
+      let exposure = moment.duration(parseFloat(e.target.value), 'seconds')
       this.store.dispatch(setExposure(exposure))
     }
   </script>
