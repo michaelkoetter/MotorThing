@@ -35,12 +35,15 @@
             </ul>
             <button class="btn fit-parent primary padded-top" onclick="{ start }">Start</button>
             <button class="btn fit-parent negative padded-top" onclick="{ stop }">Stop</button>
+            <button class="btn fit-parent padded-top" onclick="{ setHome }">Set Home</button>
+            <button class="btn fit-parent padded-top" onclick="{ getPosition }">Get Position</button>
         </div>
 
     </div>
 
     <script>
-        import { rotate, stop } from '../js/tmclAPI';
+        import { rotate, stop, setHome, getPosition } from '../js/tmclAPI'
+        import { setEndPosition } from '../js/actions/timelapse.js'
 
         this.model = {
           speed: 100,
@@ -55,8 +58,32 @@
           rotate(this.model.direction, parseInt(this.model.speed))
         }
 
+        this.setHome = () => {
+          setHome()
+        }
+
+        this.getPosition = () => {
+          getPosition()
+        }
+
         this.stop = () => {
           stop()
         }
+
+        const AP_ACTUAL_POSITION = 1
+
+        this.store.on('change', () => {
+            let state = this.state()
+            if (state.tmcl.axisParameters[AP_ACTUAL_POSITION]) {
+              // quick hack: whenever there is a position (from GET_ACTUAL_POSITION)
+              // we assume it's the end position
+              let actualPosition = state.tmcl.axisParameters[AP_ACTUAL_POSITION]
+              if (actualPosition != state.timelapse.endPosition) {
+                console.debug('Timlapse: new end position ', actualPosition)
+                this.store.dispatch(setEndPosition(actualPosition))
+              }
+            }
+        })
+
     </script>
 </velocity>

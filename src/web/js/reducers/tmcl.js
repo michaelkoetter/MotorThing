@@ -1,3 +1,4 @@
+const TMCL_GET_AXIS_PARAMETER = 6 // eslint-disable-line no-unused-vars
 
 import * as actions from '../actions/tmcl'
 
@@ -16,11 +17,24 @@ function modules(state = [], action) {
   return state
 }
 
+function axisParameters(state = {}, action) {
+  switch (action.reply.instruction) {
+    case TMCL_GET_AXIS_PARAMETER: {
+        let axisParameter = {}
+        axisParameter[action.instruction.type] = action.reply.value
+        return Object.assign({}, state, axisParameter)
+      }
+    default:
+      return state;
+  }
+}
+
 function tmcl(state = {
                 pending: [],
                 errors: [],
                 replies: [],
-                modules: []
+                modules: [],
+                axisParameters: {}
               }, action) {
 
   switch (action.type) {
@@ -39,7 +53,8 @@ function tmcl(state = {
           ...state.replies,
           { instruction: action.instruction, reply: action.reply }
         ],
-        modules: modules(state.modules, action)
+        modules: modules(state.modules, action),
+        axisParameters: axisParameters(state.axisParameters, action)
       })
 
     case actions.INSTRUCTION_ERROR:

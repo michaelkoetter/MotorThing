@@ -22,6 +22,10 @@ const TMCL_RESET_APPLICATION = 131 // eslint-disable-line no-unused-vars
 const TMCL_GET_APPLICATION_STATUS = 135 // eslint-disable-line no-unused-vars
 const TMCL_GET_FIRMWARE_VERSION = 136 // eslint-disable-line no-unused-vars
 
+// Axis Parameters
+const AP_TARGET_POSITION = 0 // eslint-disable-line no-unused-vars
+const AP_ACTUAL_POSITION = 1 // eslint-disable-line no-unused-vars
+
 let options = {
   url: 'tmcl'
 };
@@ -60,6 +64,7 @@ function dispatchNextPendingInstruction() {
         .then(json => {
           console.debug('< TMCL Reply', json)
           dispatch(actions.receiveReply(instruction, json))
+
           // continue dispatching
           dispatch(dispatchNextPendingInstruction())
         })
@@ -78,11 +83,11 @@ function dispatchNextPendingInstruction() {
 
 }
 
-function sendInstruction(instruction) {
+function sendInstruction(instruction, replyFn) {
   return dispatch => {
     if (instruction) {
       // This will add the instruction to the 'pending' list
-      dispatch(actions.sendInstruction(instruction))
+      dispatch(actions.sendInstruction(instruction, replyFn))
 
       // ... then check if we need to start dispatching
       if (store.getState().tmcl.pending.length === 1) {
@@ -139,4 +144,27 @@ export function stopApplication() {
   sendInstruction({
     instruction: TMCL_RESET_APPLICATION
   })(store.dispatch)
+}
+
+export function getAxisParameter(param) {
+  sendInstruction({
+    instruction: TMCL_GET_AXIS_PARAMETER,
+    type: param
+  })(store.dispatch)
+}
+
+export function setAxisParameter(param, value) {
+  sendInstruction({
+    instruction: TMCL_SET_AXIS_PARAMETER,
+    type: param,
+    value: value
+  })(store.dispatch)
+}
+
+export function setHome() {
+  setAxisParameter(AP_ACTUAL_POSITION, 0)
+}
+
+export function getPosition() {
+  getAxisParameter(AP_ACTUAL_POSITION)
 }
