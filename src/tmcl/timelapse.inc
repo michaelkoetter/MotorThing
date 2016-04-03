@@ -91,11 +91,14 @@ Loop:
   CALC  ADD, 1				        // CurrentShot + 1
   AGP   CurrentShot, 2
 
-  // TODO shoot
+  // shoot
+  SIO 0, 2, 1    //change DOUT0
 
   // wait for ShootTicks
   GGP   ShootTicks, 2
   CSUB  Util_Wait
+
+  SIO 0, 2, 0    //change DOUT0
 
   // wait until NextMoveTicks
   GGP   NextMoveTicks, 2
