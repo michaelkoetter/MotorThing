@@ -41,7 +41,7 @@ LoopStartTicks      = 22
 // SGP   StabilizeTicks,   2,  500
 // SGP   ShootTicks,       2,  100
 
-Setup:
+Timelapse_Main:
   SAP   138, 0, 0             //set ramp mode (position)
   SGP   CurrentShot, 2, 0    	//reset current shot & actual interval ticks
   SGP   ActualIntervalTicks, 2, 0
@@ -58,7 +58,8 @@ Setup:
   CALCX DIV					          // (EndPosition - StartPosition) / Shots
   AGP   PositionIncrement, 2
 
-  CSUB  MoveToStartPosition
+  GGP   StartPosition, 2
+  CSUB  Util_MoveTo
 
 Loop:
   GGP   132, 0				        // get tick timer (1ms resolution)
@@ -83,25 +84,22 @@ Loop:
 
   // wait for StabilizeTicks
   GGP   StabilizeTicks, 2
-  CSUB  WaitFor
+  CSUB  Util_Wait
 
   // increment CurrentShot
   GGP   CurrentShot, 2
   CALC  ADD, 1				        // CurrentShot + 1
   AGP   CurrentShot, 2
 
-  // shoot
-  SIO 0, 2, 1    //change DOUT0
+  // TODO shoot
 
   // wait for ShootTicks
   GGP   ShootTicks, 2
-  CSUB  WaitFor
-
-  SIO 0, 2, 0    //change DOUT0
+  CSUB  Util_Wait
 
   // wait until NextMoveTicks
   GGP   NextMoveTicks, 2
-  CSUB  WaitUntil
+  CSUB  Util_WaitUntil
 
   // check if we should stop (current shot >= shots)
   GGP   CurrentShot, 2
@@ -121,31 +119,9 @@ Loop:
 
   JA    Loop
 
-MoveToStartPosition:
-  GGP   StartPosition, 2
-  AAP   0, 0
-  WAIT POS, 0, 0
-  RSUB
-
-// wait for the number of ticks in accumulator
-WaitFor:
-  CALCX SWAP
-  GGP   132, 0				        // get tick timer (1ms resolution)
-  CALCX ADD					          // now + X
-  CSUB  WaitUntil
-  RSUB
-
-// wait until the ticks value in accumulator is reached
-WaitUntil:
-  CALCX SWAP
-  _WaitUntil:
-    GGP   132, 0				      // get tick timer (1ms resolution)
-    CALCX SUB					        // ticks - until
-    COMP  0
-    JC    LT, _WaitUntil			// if < 0, keep waiting
-  RSUB
-
 Stop:
   SGP   CurrentShot, 2, 0    	//reset current shot & actual interval ticks
   SGP   ActualIntervalTicks, 2, 0
-  CSUB  MoveToStartPosition
+
+  GGP   StartPosition, 2
+  CSUB  Util_MoveTo

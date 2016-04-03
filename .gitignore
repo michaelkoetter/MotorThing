@@ -2,6 +2,7 @@
 .clang_complete
 .gcc-flags.json
 *.bin
+*.sym
 data
 build
 bower_components
