@@ -1,13 +1,12 @@
 <home class="app-page">
     <header class="header-bar">
-        <div class="center">
-            <h1 class="title">MotorThing</h1>
-        </div>
+        <h1 class="title padded-left">MotorThing</h1>
     </header>
+
     <div class="content">
         <ul class="list" each={ state().tmcl.modules }>
             <li class="divider">Module { address }: { version }</li>
-            <li class="padded-list"><a data-navigation="axis-parameters/{ address }">Axis Parameters</a></li>
+            <li class="padded-list"><a data-navigation="motor-settings/{ address }">Motor Settings</a></li>
             <li class="padded-list"><a data-navigation="velocity/{ address }" data-param={ address }>Velocity Mode</a></li>
             <li class="padded-list"><a data-navigation="timelapse/{ address }" data-param={ address }>Timelapse</a></li>
         </ul>

@@ -1,19 +1,13 @@
-<axis-parameters class="app-page">
+<motor-settings class="app-page">
   <header class="header-bar">
       <a data-navigation="$previous-page" class="btn pull-left icon icon-arrow-back"></a>
-      <div class="center">
-          <h1 class="title">Axis Parameters</h1>
-      </div>
+      <a class="btn pull-right" onclick="{ selectMotor }">Motor { motor }</a>
+
+      <h1 class="title">Motor Settings</h1>
   </header>
+
   <div class="content">
       <ul class="list">
-        <li class="divider">
-          <button class="btn btn-flat pull-left icon icon-chevron-left" disabled={ motor <= 0 }
-            data-navigation="axis-parameters/{ address }/{ motor - 1 }"></button>
-          Axis { motor }
-          <button class="btn btn-flat pull-right icon icon-chevron-right"
-            data-navigation="axis-parameters/{ address }/{ motor + 1 }"></button>
-        </li>
         <li class="padded-list" each={ axisParameters }>
           { label } <span class="pull-right">{ getAxisParameter(address, motor, parameter).value }</span>
         </li>
@@ -22,6 +16,7 @@
 
   <script>
     import { getAxisParameter, setAxisParameter } from '../js/tmclAPI.js'
+    import { enterMotor } from '../js/ui/dialogs.js'
 
     this.axisParameters = [
       { parameter: 4, label: 'Maximum Positioning Speed'},
@@ -37,6 +32,10 @@
       }
     }
 
+    this.selectMotor = () => {
+      enterMotor(this.address, this.motor)
+    }
+
     this.getAxisParameter = (address, motor, parameter) =>
       this.getMotor(address, motor).parameters.filter(p => p.parameter == parameter)[0]
 
@@ -48,11 +47,11 @@
 
     this.store.on('change', () => this.update())
 
-    this.on('hashchanged', (address, motor = 0) => {
+    this.on('hashchanged', (address = 1, motor = 0) => {
       this.address = parseInt(address)
       this.motor = parseInt(motor)
       this.updateAxisParameters()
       this.update()
     })
   </script>
-</axis-parameters>
+</motor-settings>
