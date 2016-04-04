@@ -74,9 +74,20 @@ void TMCLRequestHandler::handleGet(ESP8266WebServer& server)
   instruction.reset();
   instruction.instruction(136);
 
+  int _address = 1;
+  if (server.hasArg("address")) {
+    _address = server.arg("address").toInt();
+    if (_address <= 0 || _address > 255) {
+      return server.send(400, "text/plain", "'address' must be an integer between 1 and 255");
+    }
+  }
+
+  instruction.moduleAddress((char) _address);
+
   if (tmclSendAndReceive()) {
-    StaticJsonBuffer<JSON_OBJECT_SIZE(1)> jsonBuffer;
+    StaticJsonBuffer<JSON_OBJECT_SIZE(2)> jsonBuffer;
     JsonObject& root = jsonBuffer.createObject();
+    root["address"] = _address; // echo address
     root["version"] = m_tmclBuf + 1;
     sendJson(server, root);
   } else {
@@ -136,6 +147,21 @@ void TMCLRequestHandler::handlePost(ESP8266WebServer& server)
   instruction.reset();
   instruction.instruction(request["instruction"].as<char>());
 
+  int _address = 1;
+  if (request.containsKey("address")) {
+    if (!request["address"].is<int>()) {
+      return server.send(400, "text/plain", "'address' must be an integer");
+    }
+
+    _address = request["address"].as<int>();
+    if (_address <= 0 || _address > 255) {
+      return server.send(400, "text/plain", "'address' must be an integer between 1 and 255");
+    }
+
+  }
+
+  instruction.moduleAddress((char) _address);
+
   if (request.containsKey("type")) {
     if (!request["type"].is<int>()) {
       return server.send(400, "text/plain", "'type' must be an integer");
@@ -161,8 +187,9 @@ void TMCLRequestHandler::handlePost(ESP8266WebServer& server)
     if (m_tmclTelegram->checksumOK()) {
       TMCLReply reply(m_tmclTelegram);
 
-      StaticJsonBuffer<JSON_OBJECT_SIZE(3)> replyBuffer;
+      StaticJsonBuffer<JSON_OBJECT_SIZE(4)> replyBuffer;
       JsonObject& root = replyBuffer.createObject();
+      root["address"] = reply.moduleAddress();
       root["status"] = reply.status();
       root["instruction"] = reply.instruction();
       root["value"] = reply.value();
@@ -189,12 +216,14 @@ void TMCLRequestHandler::handlePut(ESP8266WebServer& server)
  */
 void TMCLRequestHandler::handleUpload(ESP8266WebServer& server, HTTPUpload& upload)
 {
-  TMCLInstruction instruction(m_tmclTelegram);
-  TMCLReply reply(m_tmclTelegram);
-
   if (upload.status == UPLOAD_FILE_START) {
+    int _address = 1;
+    if (server.hasArg("address")) {
+      _address = server.arg("address").toInt();
+    }
+
     Serial.printf("Upload start: %s \n", upload.filename.c_str());
-    m_tmclDownload->begin();
+    m_tmclDownload->begin((char) _address);
   } else if (upload.status == UPLOAD_FILE_WRITE) {
     Serial.printf("Upload write: %s (%d bytes) \n", upload.filename.c_str(), upload.currentSize);
     m_tmclDownload->download(upload.buf, upload.currentSize);

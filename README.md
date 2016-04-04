@@ -96,12 +96,19 @@ To use this feature, place the compiled program in `data/tmcl.bin` and run the c
 The Web API endpoint is `http://<ip>/tmcl`. It supports two methods, `GET`
 and `POST`.
 
+You can communicate with multiple modules by specifying an `address` attribute
+(for `POST`/JSON requests) or request parameter (for `GET` and `PUT` requests).
+All replies contain the `address` attribute of the module that replied.
+
+If no `address` is specified, the default address `1` is used.
+
 ### Get Module Version
 
-`GET /tmcl` will get the module version and return it as a JSON object.
+`GET /tmcl[?address=<address>]` will get the module version and return it as a JSON object.
 
 ```
 {
+    "address": <address>,
     "version": "<version>"
 }
 ```
@@ -113,6 +120,7 @@ and `POST`.
 ```
 POST /tmcl
 {
+  "address": <address>,
   "instruction": <instruction>,
   "type": <type>,
   "motor": <motor>,
@@ -121,12 +129,13 @@ POST /tmcl
 ```
 
 The `"instruction"` attribute is mandatory, all other attributes are optional
-and default to `0`.
+and default to `0` or `1` for the `address` attribute.
 
 The response contains the TMCL reply as a JSON object:
 
 ```
 {
+  "address": <address>,
   "status": <status>,
   "instruction": <instruction>,
   "value": <value>
@@ -148,7 +157,7 @@ instructions and their parameters.
 
 ### Download TMCL Program
 
-`PUT /tmcl` will download a binary TMCL program to the module's EEPROM.
+`PUT /tmcl[?address=<address>]` will download a binary TMCL program to the module's EEPROM.
 Binary TMCL programs can be created using the [Trinamic TMCL-IDE][TMCL].
 
 Use a `multipart/form-data` file upload to send the binary file.
@@ -174,6 +183,7 @@ GET http://<ip>/tmcl
 Response:
 ```json
 {
+    "address": 1,
     "version": "110V3.40"
 }
 ```
@@ -193,6 +203,7 @@ POST http://<ip>/tmcl
 Response:
 ```json
 {
+  "address": 1,
   "status": 100,
   "instruction": 1,
   "value": 100
@@ -214,6 +225,7 @@ POST http://<ip>/tmcl
 Response:
 ```json
 {
+  "address": 1,
   "status": 100,
   "instruction": 6,
   "value": 2099833

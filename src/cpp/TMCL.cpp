@@ -108,7 +108,7 @@ bool TMCLInterface::receive(TMCLTelegram* telegram, int timeoutMillis)
 void TMCLInterface::send(TMCLTelegram* telegram)
 {
   m_serial->flush();
-  
+
   telegram->updateChecksum();
   if (m_debug != 0) {
     m_debug->print(">> ");
@@ -179,16 +179,24 @@ void TMCLDownload::sendAndCheck(char status)
 }
 
 
-void TMCLDownload::begin()
+void TMCLDownload::begin(char address)
 {
   if (!m_downloading) {
-    m_downloading = true;
-    m_error = false;
+    m_address = address;
 
-    TMCLInstruction startDownload(m_telegram);
-    startDownload.reset();
-    startDownload.instruction(132);
-    sendAndCheck(100);
+    if (m_address <= 0 || m_address > 255) {
+      m_downloading = false;
+      m_error = true;
+      Serial.printf("Invalid module address: %d \n", m_address);
+    } else {
+      m_downloading = true;
+      m_error = false;
+      TMCLInstruction startDownload(m_telegram);
+      startDownload.reset();
+      startDownload.moduleAddress(m_address);
+      startDownload.instruction(132);
+      sendAndCheck(100);
+    }
   }
 }
 
@@ -200,10 +208,12 @@ void TMCLDownload::end()
     TMCLInstruction stopDownload(m_telegram);
     // send a "NOOP"
     stopDownload.reset();
+    stopDownload.moduleAddress(m_address);
     sendAndCheck(101);
 
     // send the actual stop instruction
     stopDownload.reset();
+    stopDownload.moduleAddress(m_address);
     stopDownload.instruction(133);
     sendAndCheck(100);
   }
@@ -235,7 +245,7 @@ void TMCLDownload::download(unsigned char* buf, unsigned int size)
 
         if (m_telegram->checksumOK()) {
           // finished - add address and send!
-          m_telegram->data(0, 1);
+          m_telegram->data(0, m_address);
           m_telegram->updateChecksum();
           telegramPos = 0;
           sendAndCheck(101);
