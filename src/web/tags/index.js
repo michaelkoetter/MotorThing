@@ -1,6 +1,7 @@
 // This ES2015 module exports all Riot tags
 
 export { default as home } from '../tags/home.html'
+export { default as axisParameters } from '../tags/axis-parameters.html'
 export { default as velocity } from'../tags/velocity.html'
 export { default as timelapse } from'../tags/timelapse.html'
 

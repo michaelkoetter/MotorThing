@@ -7,8 +7,9 @@
     <div class="content">
         <ul class="list" each={ state().tmcl.modules }>
             <li class="divider">Module { address }: { version }</li>
-            <li><a class="padded-list" href="#!velocity">Velocity Mode</a></li>
-            <li><a class="padded-list" href="#!timelapse">Timelapse</a></li>
+            <li class="padded-list"><a data-navigation="axis-parameters/{ address }">Axis Parameters</a></li>
+            <li class="padded-list"><a data-navigation="velocity/{ address }" data-param={ address }>Velocity Mode</a></li>
+            <li class="padded-list"><a data-navigation="timelapse/{ address }" data-param={ address }>Timelapse</a></li>
         </ul>
     </div>
 

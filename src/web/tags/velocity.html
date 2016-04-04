@@ -7,6 +7,15 @@
     </header>
 
     <div class="content">
+      <ul class="list">
+        <li class="divider">
+          <button class="btn btn-flat pull-left icon icon-chevron-left" disabled={ motor <= 0 }
+            data-navigation="velocity/{ address }/{ motor - 1 }"></button>
+          Axis { motor }
+          <button class="btn btn-flat pull-right icon icon-chevron-right"
+            data-navigation="velocity/{ address }/{ motor + 1 }"></button>
+        </li>
+      </ul>
         <div class="padded-full">
 
           <div class="input-wrapper">
@@ -55,35 +64,40 @@
         }
 
         this.start = () => {
-          rotate(this.model.direction, parseInt(this.model.speed))
+          rotate(this.address, this.motor, this.model.direction, parseInt(this.model.speed))
         }
 
         this.setHome = () => {
-          setHome()
+          setHome(this.address, this.motor)
         }
 
         this.getPosition = () => {
-          getPosition()
+          getPosition(this.address, this.motor)
         }
 
         this.stop = () => {
-          stop()
+          stop(this.address, this.motor)
         }
 
         const AP_ACTUAL_POSITION = 1
 
-        this.store.on('change', () => {
-            let state = this.state()
-            if (state.tmcl.axisParameters[AP_ACTUAL_POSITION]) {
-              // quick hack: whenever there is a position (from GET_ACTUAL_POSITION)
-              // we assume it's the end position
-              let actualPosition = state.tmcl.axisParameters[AP_ACTUAL_POSITION]
-              if (actualPosition != state.timelapse.endPosition) {
-                console.debug('Timlapse: new end position ', actualPosition)
-                this.store.dispatch(setEndPosition(actualPosition))
-              }
-            }
-        })
+        // this.store.on('change', () => {
+        //     let state = this.state()
+        //     if (state.tmcl.axisParameters[AP_ACTUAL_POSITION]) {
+        //       // quick hack: whenever there is a position (from GET_ACTUAL_POSITION)
+        //       // we assume it's the end position
+        //       let actualPosition = state.tmcl.axisParameters[AP_ACTUAL_POSITION]
+        //       if (actualPosition != state.timelapse.endPosition) {
+        //         console.debug('Timlapse: new end position ', actualPosition)
+        //         this.store.dispatch(setEndPosition(actualPosition))
+        //       }
+        //     }
+        // })
 
+        this.on('hashchanged', (address, motor = 0) => {
+          this.address = parseInt(address)
+          this.motor = parseInt(motor)
+          this.update()
+        })
     </script>
 </velocity>

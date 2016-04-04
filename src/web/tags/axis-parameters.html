@@ -1,0 +1,58 @@
+<axis-parameters class="app-page">
+  <header class="header-bar">
+      <a data-navigation="$previous-page" class="btn pull-left icon icon-arrow-back"></a>
+      <div class="center">
+          <h1 class="title">Axis Parameters</h1>
+      </div>
+  </header>
+  <div class="content">
+      <ul class="list">
+        <li class="divider">
+          <button class="btn btn-flat pull-left icon icon-chevron-left" disabled={ motor <= 0 }
+            data-navigation="axis-parameters/{ address }/{ motor - 1 }"></button>
+          Axis { motor }
+          <button class="btn btn-flat pull-right icon icon-chevron-right"
+            data-navigation="axis-parameters/{ address }/{ motor + 1 }"></button>
+        </li>
+        <li class="padded-list" each={ axisParameters }>
+          { label } <span class="pull-right">{ getAxisParameter(address, motor, parameter).value }</span>
+        </li>
+      </ul>
+  </div>
+
+  <script>
+    import { getAxisParameter, setAxisParameter } from '../js/tmclAPI.js'
+
+    this.axisParameters = [
+      { parameter: 4, label: 'Maximum Positioning Speed'},
+      { parameter: 6, label: 'Absolute Maximum Current'},
+      { parameter: 7, label: 'Standby Current'},
+      { parameter: 140, label: 'Microstep Resolution'},
+      { parameter: 203, label: 'Mixed Decay Threshold'}
+    ]
+
+    this.updateAxisParameters = () => {
+      for (var param of this.axisParameters) {
+        getAxisParameter(this.address, this.motor, param.parameter)
+      }
+    }
+
+    this.getAxisParameter = (address, motor, parameter) =>
+      this.getMotor(address, motor).parameters.filter(p => p.parameter == parameter)[0]
+
+    this.getMotor = (address, motor) =>
+      this.getModule(address).motors.filter(m => m.motor == motor)[0]
+
+    this.getModule = (address) =>
+      this.state().tmcl.modules.filter(m => m.address == address)[0]
+
+    this.store.on('change', () => this.update())
+
+    this.on('hashchanged', (address, motor = 0) => {
+      this.address = parseInt(address)
+      this.motor = parseInt(motor)
+      this.updateAxisParameters()
+      this.update()
+    })
+  </script>
+</axis-parameters>

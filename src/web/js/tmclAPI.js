@@ -3,31 +3,31 @@ import fetch from 'isomorphic-fetch'
 import store from './store'
 
 // Common TMCL Instructions
-const TMCL_ROTATE_RIGHT = 1 // eslint-disable-line no-unused-vars
-const TMCL_ROTATE_LEFT = 2 // eslint-disable-line no-unused-vars
-const TMCL_MOTOR_STOP = 3 // eslint-disable-line no-unused-vars
-const TMCL_MOVE_TO_POSITION = 4 // eslint-disable-line no-unused-vars
-const TMCL_SET_AXIS_PARAMETER = 5 // eslint-disable-line no-unused-vars
-const TMCL_GET_AXIS_PARAMETER = 6 // eslint-disable-line no-unused-vars
-const TMCL_STORE_AXIS_PARAMETER = 7 // eslint-disable-line no-unused-vars
-const TMCL_RESTORE_AXIS_PARAMETER = 8 // eslint-disable-line no-unused-vars
-const TMCL_SET_GLOBAL_PARAMETER = 9 // eslint-disable-line no-unused-vars
-const TMCL_GET_GLOBAL_PARAMETER = 10 // eslint-disable-line no-unused-vars
-const TMCL_STORE_GLOBAL_PARAMETER = 11 // eslint-disable-line no-unused-vars
-const TMCL_RESTORE_GLOBAL_PARAMETER = 12 // eslint-disable-line no-unused-vars
+export const TMCL_ROTATE_RIGHT = 1 // eslint-disable-line no-unused-vars
+export const TMCL_ROTATE_LEFT = 2 // eslint-disable-line no-unused-vars
+export const TMCL_MOTOR_STOP = 3 // eslint-disable-line no-unused-vars
+export const TMCL_MOVE_TO_POSITION = 4 // eslint-disable-line no-unused-vars
+export const TMCL_SET_AXIS_PARAMETER = 5 // eslint-disable-line no-unused-vars
+export const TMCL_GET_AXIS_PARAMETER = 6 // eslint-disable-line no-unused-vars
+export const TMCL_STORE_AXIS_PARAMETER = 7 // eslint-disable-line no-unused-vars
+export const TMCL_RESTORE_AXIS_PARAMETER = 8 // eslint-disable-line no-unused-vars
+export const TMCL_SET_GLOBAL_PARAMETER = 9 // eslint-disable-line no-unused-vars
+export const TMCL_GET_GLOBAL_PARAMETER = 10 // eslint-disable-line no-unused-vars
+export const TMCL_STORE_GLOBAL_PARAMETER = 11 // eslint-disable-line no-unused-vars
+export const TMCL_RESTORE_GLOBAL_PARAMETER = 12 // eslint-disable-line no-unused-vars
 
 // TMCL Control Functions
-const TMCL_START_APPLICATION = 129 // eslint-disable-line no-unused-vars
-const TMCL_RESET_APPLICATION = 131 // eslint-disable-line no-unused-vars
-const TMCL_GET_APPLICATION_STATUS = 135 // eslint-disable-line no-unused-vars
-const TMCL_GET_FIRMWARE_VERSION = 136 // eslint-disable-line no-unused-vars
+export const TMCL_START_APPLICATION = 129 // eslint-disable-line no-unused-vars
+export const TMCL_RESET_APPLICATION = 131 // eslint-disable-line no-unused-vars
+export const TMCL_GET_APPLICATION_STATUS = 135 // eslint-disable-line no-unused-vars
+export const TMCL_GET_FIRMWARE_VERSION = 136 // eslint-disable-line no-unused-vars
 
 // Axis Parameters
-const AP_TARGET_POSITION = 0 // eslint-disable-line no-unused-vars
-const AP_ACTUAL_POSITION = 1 // eslint-disable-line no-unused-vars
+export const AP_TARGET_POSITION = 0 // eslint-disable-line no-unused-vars
+export const AP_ACTUAL_POSITION = 1 // eslint-disable-line no-unused-vars
 
 let options = {
-  url: 'tmcl'
+  url: 'http://192.168.4.1/tmcl'
 };
 
 // Check the TMCL API response
@@ -98,33 +98,40 @@ function sendInstruction(instruction, replyFn) {
   }
 }
 
-export function getModuleInfo() {
+export function getModuleInfo(address) {
   sendInstruction({
+    address: address,
     instruction: TMCL_GET_FIRMWARE_VERSION,
     type: 0
   })(store.dispatch)
 
   sendInstruction({
+    address: address,
     instruction: TMCL_GET_FIRMWARE_VERSION,
     type: 1
   })(store.dispatch)
 }
 
-export function rotate(direction, speed) {
+export function rotate(address, motor, direction, speed) {
   sendInstruction({
+    address: address,
+    motor: motor,
     instruction: direction == 'right' ? TMCL_ROTATE_RIGHT : TMCL_ROTATE_LEFT,
     value: speed
   })(store.dispatch)
 }
 
-export function stop() {
+export function stop(address, motor) {
   sendInstruction({
+    address: address,
+    motor: motor,
     instruction: TMCL_MOTOR_STOP
   })(store.dispatch)
 }
 
-export function setUserVariable(index, value) {
+export function setUserVariable(address, index, value) {
   sendInstruction({
+    address: address,
     instruction: TMCL_SET_GLOBAL_PARAMETER,
     type: index,
     motor: 2,
@@ -132,39 +139,45 @@ export function setUserVariable(index, value) {
   })(store.dispatch)
 }
 
-export function startApplication(address = 0) {
+export function startApplication(address, startAddress = 0) {
   sendInstruction({
+    address: address,
     instruction: TMCL_START_APPLICATION,
     type: 1,
-    value: address
+    value: startAddress
   })(store.dispatch)
 }
 
-export function stopApplication() {
+export function stopApplication(address) {
   sendInstruction({
+    address: address,
     instruction: TMCL_RESET_APPLICATION
   })(store.dispatch)
 }
 
-export function getAxisParameter(param) {
+export function getAxisParameter(address, motor, param) {
   sendInstruction({
+    address: address,
     instruction: TMCL_GET_AXIS_PARAMETER,
+    motor: motor,
     type: param
   })(store.dispatch)
 }
 
-export function setAxisParameter(param, value) {
+export function setAxisParameter(address, motor, param, value) {
   sendInstruction({
+    address: address,
     instruction: TMCL_SET_AXIS_PARAMETER,
+    motor: motor,
     type: param,
     value: value
   })(store.dispatch)
 }
 
-export function setHome() {
-  setAxisParameter(AP_ACTUAL_POSITION, 0)
+export function setHome(address, motor) {
+  setAxisParameter(address, motor, AP_ACTUAL_POSITION, 0)
 }
 
-export function getPosition() {
-  getAxisParameter(AP_ACTUAL_POSITION)
+export function getPosition(address, motor) {
+  getAxisParameter(address, motor, AP_ACTUAL_POSITION)
 }
