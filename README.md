@@ -16,10 +16,17 @@ interface (RS-485) is used to communicate with the TMCL module.
 MotorThing requires an ESP8266 MCU and a TMCL enabled stepper motor controller.
 
 To connect to the TMCL module, an RS-485 transceiver (MAX3485 or similar) is
-used. This transceiver needs three GPIO pins, so make sure your ESP8266 has
-them.
+used. This transceiver needs three GPIO pins for Software Serial (RX, TX and
+Transmit-Enable), so make sure your ESP8266 has them.
 
-![Transceiver Connection](doc/transceiver.png?raw=true)
+The following schematic show how to connect the MAX348x to the RS-485 bus.
+The pull-up and pull-down resistors R1 and R2 (1k) are required **somwehere on
+the bus** (but only once), otherwise it will produce communication errors when
+it is floating.
+
+The termination resistor R3 (120) is required at both ends of the bus.
+
+![Transceiver Connection](doc/rs485.png?raw=true)
 
 ## Building the Firmware
 

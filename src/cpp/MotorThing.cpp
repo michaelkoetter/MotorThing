@@ -35,6 +35,9 @@ const char* httpHeaders[HTTP_HEADERS_SIZE] {
 TMCLRequestHandler tmclRequestHandler("/tmcl", &tmclInterface);
 
 void setup() {
+  char tmclBuffer[TMCL_TELEGRAM_SIZE];
+  TMCLTelegram telegram(tmclBuffer, TMCL_TELEGRAM_SIZE);
+
   Serial.begin(115200);
   Serial.print("\n\nTMCL-WiFi Bridge\n\nSetup...\n");
 
@@ -44,6 +47,7 @@ void setup() {
   tmclSerial.setTransmitEnablePin(RS485_DE);
   tmclSerial.begin(RS485_SPEED);
   tmclInterface.setDebug(&Serial);
+
   http.addHandler(&tmclRequestHandler);
 
   if (SPIFFS.begin()) {
@@ -54,8 +58,6 @@ void setup() {
       Serial.printf("Found '%s', starting TMCL download... \n", TMCL_INIT_FILE);
       File tmclBin = SPIFFS.open(TMCL_INIT_FILE, "r");
       if (tmclBin) {
-        char tmclBuffer[TMCL_TELEGRAM_SIZE];
-        TMCLTelegram telegram(tmclBuffer, TMCL_TELEGRAM_SIZE);
         TMCLDownload download(&tmclInterface, &telegram);
         download.download(tmclBin);
         Serial.printf("TMCL download %s \n", download.error() ? "ERROR" : "OK");

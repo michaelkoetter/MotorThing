@@ -76,14 +76,8 @@ bool TMCLInterface::receive(TMCLTelegram* telegram, int timeoutMillis)
   unsigned long timeout = millis() + timeoutMillis;
   int len = telegram->size();
 
-  // swallow zeros - the telegram starts with a non-zero byte
-  while (m_serial->available() && m_serial->peek() == 0x00)
-    m_serial->read();
-
   do {
-    int available = m_serial->available();
-
-    if (available >= len) {
+    if (m_serial->available() >= len) {
       // we can read a complete telegram
       for (int i = 0; i < len; i++)
         telegram->data(i, m_serial->read());
@@ -94,10 +88,7 @@ bool TMCLInterface::receive(TMCLTelegram* telegram, int timeoutMillis)
         m_debug->print("\n");
       }
       return true;
-    } else if (available > 0) {
-      // telegram is not complete yet
     }
-
     yield();
   } while (millis() < timeout);
 
@@ -107,8 +98,6 @@ bool TMCLInterface::receive(TMCLTelegram* telegram, int timeoutMillis)
 
 void TMCLInterface::send(TMCLTelegram* telegram)
 {
-  m_serial->flush();
-
   telegram->updateChecksum();
   if (m_debug != 0) {
     m_debug->print(">> ");
