@@ -78,7 +78,7 @@ void TMCLRequestHandler::handleGet(ESP8266WebServer& server)
   if (server.hasArg("address")) {
     _address = server.arg("address").toInt();
     if (_address <= 0 || _address > 255) {
-      return server.send(400, "text/plain", "'address' must be an integer between 1 and 255");
+      return sendStatus(server, 0, "'address' must be an integer between 1 and 255", 400);
     }
   }
 
@@ -91,7 +91,7 @@ void TMCLRequestHandler::handleGet(ESP8266WebServer& server)
     root["version"] = m_tmclBuf + 1;
     sendJson(server, root);
   } else {
-    server.send(504, "text/plain", "TMCL timeout");
+    sendStatus(server, _address, "TMCL reply timeout", 504);
   }
 }
 
@@ -121,7 +121,7 @@ void TMCLRequestHandler::handleGet(ESP8266WebServer& server)
 void TMCLRequestHandler::handlePost(ESP8266WebServer& server)
 {
   if (!server.hasArg("plain")) {
-    return server.send(400, "text/plain", "No POST data");
+    return sendStatus(server, 0, "No POST data", 400);
   }
 
   String _request = server.arg("plain");
@@ -132,53 +132,54 @@ void TMCLRequestHandler::handlePost(ESP8266WebServer& server)
   JsonObject& request = requestBuffer.parseObject(_request);
 
   if (!request.success()) {
-    return server.send(400, "text/plain", "JSON parse error");
+    return sendStatus(server, 0, "JSON parse error", 400);
+  }
+
+  int _address = 1;
+  if (request.containsKey("address")) {
+    if (!request["address"].is<int>()) {
+      return sendStatus(server, 0, "'address' must be an integer", 400);
+    }
+
+    _address = request["address"].as<int>();
+    if (_address <= 0 || _address > 255) {
+      return sendStatus(server, 0, "'address' must be an integer between 1 and 255", 400);
+    }
+
   }
 
   if (!request.containsKey("instruction")) {
-    return server.send(400, "text/plain", "'instruction' is required");
+    return sendStatus(server, _address, "'instruction' is required", 400);
   }
 
   if (!request["instruction"].is<int>()) {
-    return server.send(400, "text/plain", "'instruction' must be an integer");
+    return sendStatus(server, _address, "'instruction' must be an integer", 400);
   }
 
   TMCLInstruction instruction(m_tmclTelegram);
   instruction.reset();
   instruction.instruction(request["instruction"].as<char>());
 
-  int _address = 1;
-  if (request.containsKey("address")) {
-    if (!request["address"].is<int>()) {
-      return server.send(400, "text/plain", "'address' must be an integer");
-    }
-
-    _address = request["address"].as<int>();
-    if (_address <= 0 || _address > 255) {
-      return server.send(400, "text/plain", "'address' must be an integer between 1 and 255");
-    }
-
-  }
 
   instruction.moduleAddress((char) _address);
 
   if (request.containsKey("type")) {
     if (!request["type"].is<int>()) {
-      return server.send(400, "text/plain", "'type' must be an integer");
+      return sendStatus(server, _address, "'type' must be an integer", 400);
     }
     instruction.type(request["type"].as<char>());
   }
 
   if (request.containsKey("motor")) {
     if (!request["motor"].is<int>()) {
-      return server.send(400, "text/plain", "'motor' must be an integer");
+      return sendStatus(server, _address, "'motor' must be an integer", 400);
     }
     instruction.motor(request["motor"].as<char>());
   }
 
   if (request.containsKey("value")) {
     if (!request["value"].is<int>()) {
-      return server.send(400, "text/plain", "'value' must be an integer");
+      return sendStatus(server, _address, "'value' must be an integer", 400);
     }
     instruction.value(request["value"].as<int>());
   }
@@ -195,19 +196,19 @@ void TMCLRequestHandler::handlePost(ESP8266WebServer& server)
       root["value"] = reply.value();
       sendJson(server, root);
     } else {
-      server.send(502, "text/plain", "TMCL reply checksum error");
+      sendStatus(server, _address, "TMCL reply checksum error", 502);
     }
   } else {
-    server.send(504, "text/plain", "TMCL reply timeout");
+    sendStatus(server, _address, "TMCL reply timeout", 504);
   }
 }
 
 void TMCLRequestHandler::handlePut(ESP8266WebServer& server)
 {
   if (!m_tmclDownload->error()) {
-    server.send(200, "text/plain", "TMCL download OK");
+    sendStatus(server, m_tmclDownload->address(), "TMCL download OK");
   } else {
-    server.send(500, "text/plain", "TMCL download error");
+    sendStatus(server, m_tmclDownload->address(), "TMCL download error", 500);
   }
 }
 
@@ -236,9 +237,23 @@ void TMCLRequestHandler::handleUpload(ESP8266WebServer& server, HTTPUpload& uplo
   yield();
 }
 
-void TMCLRequestHandler::sendJson(ESP8266WebServer& server, JsonObject& json)
+void TMCLRequestHandler::sendStatus(ESP8266WebServer& server, unsigned char address, const char * message, int status)
+{
+  StaticJsonBuffer<JSON_OBJECT_SIZE(2)> replyBuffer;
+  JsonObject& root = replyBuffer.createObject();
+  root["address"] = address;
+  if (status >= 400) {
+    root["error"] = message;
+  } else {
+    root["status"] = message;
+  }
+
+  sendJson(server, root, status);
+}
+
+void TMCLRequestHandler::sendJson(ESP8266WebServer& server, JsonObject& json, int status)
 {
   String content;
   json.printTo(content);
-  server.send(200, "application/json", content);
+  server.send(status, "application/json", content);
 }

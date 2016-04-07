@@ -1,0 +1,57 @@
+<motor-settings class="app-page">
+  <header class="header-bar">
+      <a data-navigation="$previous-page" class="btn pull-left icon icon-arrow-back"></a>
+      <a class="btn pull-right" onclick="{ selectMotor }">Motor { motor }</a>
+
+      <h1 class="title">Settings: { module().version }</h1>
+  </header>
+
+  <div class="content">
+      <ul class="list">
+        <li class="padded-list" each={ axisParameters }>
+          { label } <span class="pull-right">{ getAxisParameter(parameter).value }</span>
+        </li>
+      </ul>
+  </div>
+
+  <script>
+    import { getAxisParameter, setAxisParameter } from '../js/tmclAPI.js'
+    import { enterMotor } from '../js/ui/dialogs.js'
+
+    this.axisParameters = [
+      { parameter: 4, label: 'Maximum Positioning Speed'},
+      { parameter: 6, label: 'Absolute Maximum Current'},
+      { parameter: 7, label: 'Standby Current'},
+      { parameter: 140, label: 'Microstep Resolution'},
+      { parameter: 203, label: 'Mixed Decay Threshold'}
+    ]
+
+    this.updateAxisParameters = () => {
+      for (var param of this.axisParameters) {
+        getAxisParameter(this.address, this.motor, param.parameter)
+      }
+    }
+
+    this.selectMotor = () => {
+      enterMotor(this.address, this.motor)
+    }
+
+    this.getAxisParameter = (parameter) =>
+      this.getMotor().parameters.find(p => p.parameter == parameter)
+
+    this.getMotor = () =>
+      this.module().motors.find(m => m.motor == this.motor)
+
+    this.module = () =>
+      this.state().tmcl.modules.find(m => m.address == this.address)
+
+    this.store.on('change', () => this.update())
+
+    this.on('hashchanged', (address = 1, motor = 0) => {
+      this.address = parseInt(address)
+      this.motor = parseInt(motor)
+      this.updateAxisParameters()
+      this.update()
+    })
+  </script>
+</motor-settings>
