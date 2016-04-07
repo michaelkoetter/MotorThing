@@ -6,8 +6,8 @@ import {
   TMCL_GET_AXIS_PARAMETER,
   TMCL_SET_AXIS_PARAMETER,
 
-  TMCL_GET_GLOBAL_PARAMETER,
-  TMCL_SET_GLOBAL_PARAMETER
+  TMCL_GET_GLOBAL_PARAMETER, // eslint-disable-line no-unused-vars
+  TMCL_SET_GLOBAL_PARAMETER // eslint-disable-line no-unused-vars
 } from '../tmclAPI.js'
 
 import * as actions from '../actions/tmcl'
@@ -54,7 +54,7 @@ import * as actions from '../actions/tmcl'
  */
 
 
-function globalParameters(state = [], action) {
+function globalParameters(state = [], action) { // eslint-disable-line no-unused-vars
   return state
 }
 
