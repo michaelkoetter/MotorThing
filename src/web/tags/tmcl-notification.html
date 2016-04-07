@@ -5,23 +5,23 @@
 
   <div class="notification error" id="tmcl-errors">
     <div if={ !showAllErrors }>
-      { state().tmcl.errors[0].error }
+      { filterErrors()[0].error }
     </div>
 
     <div if={ showAllErrors }>
-      <div each={ state().tmcl.errors }>{ error }</div>
+      <div each={ filterErrors() }>{ error }</div>
     </div>
 
     <div>
       &nbsp;
 
       <button class="btn pull-right" onclick="{ dismissAllErrors }">
-        Dismiss<span if={state().tmcl.errors.length > 1}> All</span>
+        Dismiss<span if={filterErrors().length > 1}> All</span>
       </button>
 
       <button class="btn pull-right" onclick="{ toggleAllErrors }"
-        if={ !showAllErrors && state().tmcl.errors.length > 1 }>
-        { state().tmcl.errors.length - 1 } more...
+        if={ !showAllErrors && filterErrors().length > 1 }>
+        { filterErrors().length - 1 } more...
       </button>
     </div>
   </div>
@@ -29,10 +29,16 @@
   <script>
     import phonon from 'phonon'
     import { dismissAllErrors } from '../js/actions/tmcl'
+    import { TMCL_GET_FIRMWARE_VERSION } from '../js/tmclAPI'
 
     this.busy = false
     this.errors = false
     this.showAllErrors = false
+
+    // don't show firmware version request errors (module discovery)
+    this.filterErrors = () =>
+      this.state().tmcl.errors.filter(e => e.instruction.instruction != TMCL_GET_FIRMWARE_VERSION)
+
 
     this.dismissAllErrors = () => {
       this.showAllErrors = false
@@ -64,11 +70,12 @@
     this.store.on('change', () => {
       this.showNotifications(
         this.state().tmcl.pending.length > 0,
-        this.state().tmcl.errors.length > 0
+        this.filterErrors().length > 0
       )
 
       this.update()
     })
+
 
   </script>
 </tmcl-notification>

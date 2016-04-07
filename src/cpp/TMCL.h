@@ -100,17 +100,18 @@ class TMCLDownload
 public:
   TMCLDownload(TMCLInterface* interface, TMCLTelegram* telegram);
 
-  void begin(char address = 1);
+  void begin(unsigned char address = 1);
   void end();
   void download(unsigned char* buf, unsigned int size);
   void download(Stream& stream);
 
   bool error() { return m_error; }
-
+  unsigned char address() { return m_address; }
+  
 private:
   void            sendAndCheck(char status);
 
-  char            m_address;
+  unsigned char   m_address;
   TMCLInterface*  m_interface;
   TMCLTelegram*   m_telegram;
   bool            m_error;

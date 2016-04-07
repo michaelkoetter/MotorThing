@@ -25,7 +25,8 @@ private:
   void            handlePut(ESP8266WebServer& server);
   void            handleUpload(ESP8266WebServer& server, HTTPUpload& upload);
 
-  void            sendJson(ESP8266WebServer& server, JsonObject& json);
+  void            sendStatus(ESP8266WebServer& server, unsigned char address, const char * message, int status = 200);
+  void            sendJson(ESP8266WebServer& server, JsonObject& json, int status = 200);
 
   bool            tmclSendAndReceive() { return m_tmclInterface->sendAndReceive(m_tmclTelegram); }
 
