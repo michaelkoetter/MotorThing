@@ -17,11 +17,11 @@ export function startTimelapse(address = 1) {
   let timelapse = store.getState().timelapse
   console.debug('Start timelapse with params: ', JSON.stringify(timelapse))
 
-  setUserVariable(PARAM_SHOTS, timelapse.shots)
-  setUserVariable(PARAM_INTERVAL, timelapse.interval.asMilliseconds())
-  setUserVariable(PARAM_STABILIZE, timelapse.stabilize.asMilliseconds())
-  setUserVariable(PARAM_EXPOSURE, timelapse.exposure.asMilliseconds())
-  setUserVariable(PARAM_REVERSE, timelapse.reverse ? 1 : 0)
+  setUserVariable(address, PARAM_SHOTS, timelapse.shots)
+  setUserVariable(address, PARAM_INTERVAL, timelapse.interval.asMilliseconds())
+  setUserVariable(address, PARAM_STABILIZE, timelapse.stabilize.asMilliseconds())
+  setUserVariable(address, PARAM_EXPOSURE, timelapse.exposure.asMilliseconds())
+  setUserVariable(address, PARAM_REVERSE, timelapse.reverse ? 1 : 0)
 
   // start the application
   startApplication(address, APPLICATION_ADDRESS)
