@@ -2,22 +2,15 @@ import * as actions from '../actions/timelapse'
 import moment from 'moment'
 
 function timelapse(state = {
-                    startPosition: 0,
-                    endPosition: 100000,
                     shots: 300,
                     interval: moment.duration(1, 'seconds'),
                     time: moment.duration(300, 'seconds'),
                     exposure: moment.duration(100, 'milliseconds'),
-                    stabilize: moment.duration(0, 'milliseconds')
+                    stabilize: moment.duration(0, 'milliseconds'),
+                    reverse: false
                   }, action) {
 
   switch (action.type) {
-    case actions.SET_START_POSITION:
-      return Object.assign({}, state, { startPosition: action.startPosition })
-
-    case actions.SET_END_POSITION:
-      return Object.assign({}, state, { endPosition: action.endPosition })
-
     case actions.SET_SHOTS_AND_INTERVAL:
       // calculate time
       return Object.assign({}, state, {
@@ -39,6 +32,9 @@ function timelapse(state = {
 
     case actions.SET_STABILIZE:
       return Object.assign({}, state, { stabilize: actions.stabilize })
+
+   case actions.SET_REVERSE:
+      return Object.assign({}, state, { reverse: action.reverse })
 
     default:
       return state

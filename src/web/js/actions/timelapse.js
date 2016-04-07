@@ -4,8 +4,7 @@ export const SET_SHOTS_AND_INTERVAL = 'SET_SHOTS_AND_INTERVAL'
 export const SET_TIME_AND_INTERVAL = 'SET_TIME_AND_INTERVAL'
 export const SET_EXPOSURE = 'SET_EXPOSURE'
 export const SET_STABILIZE = 'SET_STABILIZE'
-export const SET_START_POSITION = 'SET_START_POSITION'
-export const SET_END_POSITION = 'SET_END_POSITION'
+export const SET_REVERSE = 'SET_REVERSE'
 
 // Action Creators
 
@@ -39,16 +38,9 @@ export function setStabilize(stabilize) {
   }
 }
 
-export function setStartPosition(startPosition) {
+export function setReverse(reverse) {
   return {
-    type: SET_START_POSITION,
-    startPosition
-  }
-}
-
-export function setEndPosition(endPosition) {
-  return {
-    type: SET_END_POSITION,
-    endPosition
+    type: SET_REVERSE,
+    reverse
   }
 }
