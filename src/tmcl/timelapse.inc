@@ -42,15 +42,16 @@ Timelapse_Main:
   SGP   ActualIntervalTicks, 2, 0
 
   // calculate the position increment between shots
-  // PositionIncrement = (EndPosition - StartPosition) / Shots
+  // PositionIncrement = (EndPosition - StartPosition) / (Shots - 1)
   CSUB  Timelapse_Get_StartPosition
   CALCX SWAP
   CSUB  Timelapse_Get_EndPosition
   CALCX SUB                               // EndPosition - StartPosition
   CALCX SWAP
   GGP   Shots, 2
+  CALC  SUB, 1 						 // Shots - 1
   CALCX SWAP
-  CALCX DIV					          // (EndPosition - StartPosition) / Shots
+  CALCX DIV					          // (EndPosition - StartPosition) / (Shots - 1)
   AGP   PositionIncrement, 2
 
   CSUB  Timelapse_Get_StartPosition
