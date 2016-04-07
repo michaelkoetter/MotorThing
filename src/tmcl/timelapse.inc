@@ -7,12 +7,11 @@
 //////////////////////////////////////////////////////////////////////////////
 // User Variables - Sequence Parameters
 //////////////////////////////////////////////////////////////////////////////
-StartPosition       = 0
-EndPosition         = 1
-Shots               = 2
-IntervalTicks       = 3
-StabilizeTicks      = 4
-ShootTicks          = 5
+Shots               = 0
+IntervalTicks       = 1
+StabilizeTicks      = 2
+ShootTicks          = 3
+Reverse             = 4
 
 //////////////////////////////////////////////////////////////////////////////
 // User Variables - Status
@@ -20,6 +19,11 @@ ShootTicks          = 5
 CurrentShot         = 10
 // the actual interval ticks - can be used to monitor timing
 ActualIntervalTicks = 11
+
+//////////////////////////////////////////////////////////////////////////////
+// Coordinates
+//////////////////////////////////////////////////////////////////////////////
+EndCoordinate       = 1
 
 //////////////////////////////////////////////////////////////////////////////
 // Internal Variables
@@ -31,37 +35,28 @@ NextMoveTicks       = 21
 // start of the loop iteration
 LoopStartTicks      = 22
 
-//////////////////////////////////////////////////////////////////////////////
-// Set Variables - TODO these should be set by the MCU later
-//////////////////////////////////////////////////////////////////////////////
-// SGP   StartPosition,    2,  0
-// SGP   EndPosition,      2,  100000
-// SGP   Shots,            2,  10
-// SGP   IntervalTicks,    2,  1000
-// SGP   StabilizeTicks,   2,  500
-// SGP   ShootTicks,       2,  100
 
 Timelapse_Main:
-  SAP   138, 0, 0             //set ramp mode (position)
-  SGP   CurrentShot, 2, 0    	//reset current shot & actual interval ticks
+  //reset current shot & actual interval ticks
+  SGP   CurrentShot, 2, 0    	
   SGP   ActualIntervalTicks, 2, 0
 
   // calculate the position increment between shots
   // PositionIncrement = (EndPosition - StartPosition) / Shots
-  GGP   StartPosition, 2
+  CSUB  Timelapse_Get_StartPosition
   CALCX SWAP
-  GGP   EndPosition, 2
-  CALCX SUB					          // EndPosition - StartPosition
+  CSUB  Timelapse_Get_EndPosition
+  CALCX SUB                               // EndPosition - StartPosition
   CALCX SWAP
   GGP   Shots, 2
   CALCX SWAP
   CALCX DIV					          // (EndPosition - StartPosition) / Shots
   AGP   PositionIncrement, 2
 
-  GGP   StartPosition, 2
+  CSUB  Timelapse_Get_StartPosition
   CSUB  Util_MoveTo
 
-Loop:
+Timelapse_Loop:
   GGP   132, 0				        // get tick timer (1ms resolution)
   AGP   LoopStartTicks, 2
   // calculate next move time: now + IntervalTicks
@@ -77,10 +72,9 @@ Loop:
   GGP   PositionIncrement, 2
   CALCX MUL					          // CurrentShot * PositionIncrement
   CALCX SWAP
-  GGP   StartPosition, 2
+  CSUB  Timelapse_Get_StartPosition
   CALCX ADD					          // StartPosition + (CurrentShot * PositionIncrement)
-  AAP   0, 0					        // set new target position
-  WAIT  POS, 0, 0			        // wait until we reach it
+  CSUB  Util_MoveTo			          // set new target position
 
   // wait for StabilizeTicks
   GGP   StabilizeTicks, 2
@@ -110,7 +104,7 @@ Loop:
   GGP   Shots, 2
   CALCX SUB					          // Shots - CurrentShot
   COMP  0
-  JC    LE, Stop
+  JC    LE, Timelapse_Stop
   // otherwise, continue loop
 
   // calculate actual interval ticks
@@ -120,11 +114,41 @@ Loop:
   CALCX SUB
   AGP   ActualIntervalTicks, 2
 
-  JA    Loop
+  JA    Timelapse_Loop
 
-Stop:
-  SGP   CurrentShot, 2, 0    	//reset current shot & actual interval ticks
+
+Timelapse_Get_StartPosition:
+  GGP   Reverse, 2
+  JC    NZ, _Get_StartPosition_Reverse
+
+  // in normal mode, our start position is always 0
+  CALC  LOAD, 0
+  RSUB
+
+_Get_StartPosition_Reverse:
+  // in reverse mode, our start position is the EndCoordinate
+  GCO   EndCoordinate, 0
+  RSUB
+
+Timelapse_Get_EndPosition:
+  GGP   Reverse, 2
+  JC    NZ, _Get_EndPosition_Reverse
+
+  // in normal mode, our end position is the EndCoordinate
+  GCO   EndCoordinate, 0
+  RSUB
+
+_Get_EndPosition_Reverse:
+  // in reverse mode, our end position is always 0
+  CALC  LOAD, 0
+  RSUB
+
+
+Timelapse_Stop:
+  //reset current shot & actual interval ticks
+  SGP   CurrentShot, 2, 0    	
   SGP   ActualIntervalTicks, 2, 0
 
-  GGP   StartPosition, 2
+  // move to start
+  CSUB  Timelapse_Get_StartPosition
   CSUB  Util_MoveTo
