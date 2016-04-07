@@ -179,7 +179,7 @@ void TMCLDownload::sendAndCheck(char status)
 }
 
 
-void TMCLDownload::begin(char address)
+void TMCLDownload::begin(unsigned char address)
 {
   if (!m_downloading) {
     m_address = address;
