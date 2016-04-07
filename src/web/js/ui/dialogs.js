@@ -19,7 +19,8 @@ export function enterNumber(title, opts, confirmFn = () => {}, cancelFn = () => 
   titleEl.innerHTML = title
 
   let dialog = phonon.dialog(dialogEl)
+  dialog.open()
   dialog.on('confirm', confirmFn)
   dialog.on('cancel', cancelFn)
-  dialog.open()
+
 }

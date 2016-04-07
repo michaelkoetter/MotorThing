@@ -109,6 +109,43 @@ function sendInstruction(instruction, replyFn) {
   }
 }
 
+
+function saveModulesState() {
+  // we store only the address
+  let modules = store.getState().tmcl.modules.map(m => {
+    return { address: m.address }
+  });
+
+  localStorage.tmclModules = JSON.stringify(modules)
+}
+
+export function loadModules() {
+  let _modules = localStorage.tmclModules
+  if (_modules) {
+    let modules = JSON.parse(_modules)
+    console.debug('load modules', modules)
+    modules.forEach(m => {
+      store.dispatch(actions.addModule(m.address))
+      getModuleInfo(m.address)
+    })
+  }
+}
+
+export function addModule(address) {
+  return dispatch => {
+    dispatch(actions.addModule(address))
+    getModuleInfo(address)
+    saveModulesState()
+  }
+}
+
+export function removeModule(address) {
+  return dispatch => {
+    dispatch(actions.removeModule(address))
+    saveModulesState()
+  }
+}
+
 export function getModuleInfo(address) {
   sendInstruction({
     address: address,

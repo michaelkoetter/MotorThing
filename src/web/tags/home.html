@@ -1,23 +1,64 @@
 <home class="app-page">
     <header class="header-bar">
+        <a class="btn pull-right icon icon-add" onclick="{ addModule }"></a>
+
         <h1 class="title padded-left">MotorThing</h1>
     </header>
 
     <div class="content">
         <ul class="list" each={ state().tmcl.modules }>
-            <li class="divider">Module { address }: { version }</li>
-            <li class="padded-list"><a data-navigation="motor-settings/{ address }">Motor Settings</a></li>
-            <li class="padded-list"><a data-navigation="velocity/{ address }" data-param={ address }>Velocity Mode</a></li>
-            <li class="padded-list"><a data-navigation="timelapse/{ address }" data-param={ address }>Timelapse</a></li>
+            <li class="divider" style="padding-right: 0px">
+              <a class="btn btn-flat pull-right icon icon-close" onclick="{ removeModule(address) }"></a>
+              <a if={ version } class="btn btn-flat pull-right icon icon-settings" data-navigation="motor-settings/{ address }"></a>
+              <a if={ !version } class="btn btn-flat pull-right icon icon-sync" onclick="{ retry(address) }"></a>
+
+              Module { address }:
+              <span if={ version }>{ version }</span>
+              <span if={ !version && isPendingVersionRequest(address) }>Searching...</span>
+              <span if={ !version && !isPendingVersionRequest(address) }>Not found</span>
+            </li>
+            <li if={ version } class="padded-list"><a data-navigation="velocity/{ address }" data-param={ address }>Velocity Mode</a></li>
+            <li if={ version } class="padded-list"><a data-navigation="timelapse/{ address }" data-param={ address }>Timelapse</a></li>
         </ul>
+
+        <div if={ state().tmcl.modules.length == 0 } class="padded-full">
+          <div>
+            Please add a module.
+          </div>
+
+          <button class="btn btn-primary fit-parent padded-top" onclick={ addModule }>Add Module</button>
+        </div>
     </div>
 
     <script>
-        import { getModuleInfo } from '../js/tmclAPI'
+        import { loadModules, addModule, removeModule, getModuleInfo, TMCL_GET_FIRMWARE_VERSION } from '../js/tmclAPI'
+        import { enterNumber } from '../js/ui/dialogs'
+
+        this.isPendingVersionRequest = (address) =>
+          this.state().tmcl.pending
+            .filter(i => i.address == address && i.instruction == TMCL_GET_FIRMWARE_VERSION)
+            .length > 0
+
+        this.retry = (address) =>
+          () => {
+            getModuleInfo(address)
+          }
+
+        this.removeModule = (address) =>
+          () => {
+            this.store.dispatch(removeModule(address))
+          }
+
+        this.addModule = () => {
+          enterNumber('Module Address', { value: 1, min: 1, max: 255, step: 1 }, (input) => {
+            this.store.dispatch(addModule(parseInt(input)))
+          })
+        }
 
         this.store.on('change', () => this.update())
+
         this.on('create', () => {
-          getModuleInfo()
-        });
+          loadModules()
+        })
     </script>
 </home>

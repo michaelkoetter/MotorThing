@@ -119,7 +119,7 @@ function motors(state = [], action) {
 }
 
 function module(state = {}, action) {
-  if (state.address == action.reply.address) {
+  if (action.reply && state.address == action.reply.address) {
     if (action.reply.version) {
       return Object.assign({}, state, {
         version: action.reply.version,
@@ -137,16 +137,23 @@ function module(state = {}, action) {
 }
 
 function modules(state = [], action) {
-  if (!state.find(m => m.address == action.reply.address)) {
-    // module discovery: we got a reply from a new module, so add it to our state
-    console.debug('Discovered new module: ', action.reply.address)
-    return [
-      ...state,
-      module({ address: action.reply.address }, action)
-    ]
-  }
+  switch (action.type) {
+    case actions.ADD_MODULE: {
+      if (!state.find(m => m.address == action.address))
+        return [
+          ...state,
+          { address: action.address }
+        ]
 
-  return state.map(m => module(m, action))
+      return state // make sure we only add each address once
+    }
+
+    case actions.REMOVE_MODULE:
+      return state.filter(m => m.address != action.address)
+
+    default:
+      return state.map(m => module(m, action))
+  }
 }
 
 function tmcl(state = {
@@ -157,12 +164,19 @@ function tmcl(state = {
               }, action) {
 
   switch (action.type) {
+    case actions.ADD_MODULE:
+    case actions.REMOVE_MODULE:
+      return Object.assign({}, state, {
+        modules: modules(state.modules, action)
+      })
+
     case actions.INSTRUCTION_REQUEST:
       return Object.assign({}, state, {
         pending: [
           ...state.pending,
           action.instruction
-        ]
+        ],
+        modules: modules(state.modules, action)
       })
 
     case actions.INSTRUCTION_REPLY:
@@ -180,7 +194,7 @@ function tmcl(state = {
         pending: state.pending.filter( instruction => instruction !== action.instruction ),
         errors: [
           ...state.errors,
-          { instruction: action.instructíon, error: action.error }
+          { instruction: action.instruction, error: action.error }
         ]
       })
 
