@@ -14,9 +14,19 @@
       </div>
       <div class="input-wrapper">
         <input class="with-label" type="number" step="0.1" min="0.0" name="exposure"
-        oninput="{ parent.setExposure }"
-        value="{ state().timelapse.exposure.asSeconds() }">
+          oninput="{ parent.setExposure }"
+          value="{ state().timelapse.exposure.asSeconds() }">
         <label class="floating-label" for="exposure">Exposure (seconds)</label>
+      </div>
+
+      <div>
+        <label class="checkbox">
+            <input type="checkbox" class="" name="reverse"
+              onchange="{ parent.setReverse }"
+              checked="{ state().timelapse.reverse }">
+            Reverse
+            <span></span>
+        </label>
       </div>
 
       <table class="table padded-top" style="width: 100%">
@@ -38,11 +48,17 @@
         </tbody>
       </table>
 
-      <button class="btn fit-parent primary padded-top"
-        disabled="{ state().tmcl.pending.length > 0 }"
-        onclick="{ parent.start }">Start</button>
-
-      <button class="btn fit-parent negative padded-top" onclick="{ parent.stop }">Stop</button>
+      <div class="row padded-top">
+        <div class="phone-5 column">
+          <button class="btn fit-parent primary"
+            disabled="{ state().tmcl.pending.length > 0 }"
+            onclick="{ parent.start }">Start</button>
+        </div>
+        <div class="phone-1 column">&nbsp;</div>
+        <div class="phone-5 column">
+          <button class="btn fit-parent negative" onclick="{ parent.stop }">Stop</button>
+        </div>
+      </div>
   </div>
 
   <script>

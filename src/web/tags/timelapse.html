@@ -21,7 +21,7 @@
 
   <script>
     import moment from 'moment'
-    import { setExposure } from '../js/actions/timelapse'
+    import { setExposure, setReverse } from '../js/actions/timelapse'
     import { startTimelapse, stopTimelapse } from '../js/timelapseAPI'
 
     // TODO make this configurable
@@ -47,6 +47,10 @@
     this.setExposure = (e) => {
       let exposure = moment.duration(parseFloat(e.target.value), 'seconds')
       this.store.dispatch(setExposure(exposure))
+    }
+
+    this.setReverse = (e) => {
+      this.store.dispatch(setReverse(e.target.checked))
     }
 
     this.on('hashchanged', (address = 1, motor = 0) => {
