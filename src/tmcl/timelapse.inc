@@ -41,6 +41,11 @@ Timelapse_Main:
   SGP   CurrentShot, 2, 0    	
   SGP   ActualIntervalTicks, 2, 0
 
+  // Copy EndCoordinate from EEPROM to RAM
+  // This is required for some modules that default to store coordindates in RAM only 
+  // - other modules will probably ignore it
+  GCO   EndCoordinate, 255
+
   // calculate the position increment between shots
   // PositionIncrement = (EndPosition - StartPosition) / (Shots - 1)
   CSUB  Timelapse_Get_StartPosition

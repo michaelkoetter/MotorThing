@@ -249,9 +249,29 @@ export function captureCoordinate(address, motor, coordinate) {
     instruction: TMCL_CAPTURE_COORDINATE,
     type: coordinate
   })(store.dispatch)
+
+  // Copy the coordinate to EEPROM
+  // This is required for some modules that default to store coordindates in RAM only
+  // - other modules will probably ignore it
+  sendInstruction({
+    address,
+    motor: 255,   // special flag: store in EEPROM
+    instruction: TMCL_SET_COORDINATE,
+    type: coordinate
+  })(store.dispatch)
 }
 
 export function moveToCoordinate(address, motor, coordinate) {
+  // Copy the coordinate to RAM
+  // This is required for some modules that default to store coordindates in RAM only
+  // - other modules will probably ignore it
+  sendInstruction({
+    address,
+    motor: 255,   // special flag: store in EEPROM
+    instruction: TMCL_GET_COORDINATE,
+    type: coordinate
+  })(store.dispatch)
+
   sendInstruction({
     address,
     motor,
