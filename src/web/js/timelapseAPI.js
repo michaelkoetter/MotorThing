@@ -12,7 +12,7 @@ const PARAM_STABILIZE = 2
 const PARAM_EXPOSURE = 3
 const PARAM_REVERSE = 4
 
-export function startTimelapse(address = 1) {
+export function startTimelapse(address) {
   // setup
   let timelapse = store.getState().timelapse
   console.debug('Start timelapse with params: ', JSON.stringify(timelapse))
@@ -27,6 +27,6 @@ export function startTimelapse(address = 1) {
   startApplication(address, APPLICATION_ADDRESS)
 }
 
-export function stopTimelapse(address = 1) {
+export function stopTimelapse(address) {
   stopApplication(address)
 }

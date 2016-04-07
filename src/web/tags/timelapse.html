@@ -1,7 +1,7 @@
 <timelapse class="app-page">
   <header class="header-bar">
       <a data-navigation="$previous-page" class="btn pull-left icon icon-arrow-back"></a>
-      <h1 class="title padded-left">Timelapse</h1>
+      <h1 class="title padded-left">Timelapse: { module().version }</h1>
   </header>
   <nav class="tabs header-tabs">
       <div class="tab-items">
@@ -29,22 +29,30 @@
       24, 25, 30
     ]
 
+    this.module = () => this.state().tmcl.modules.find(m => m.address == this.address)
+
     this.durationAt = (fps) => {
       let shots = this.state().timelapse.shots;
       return moment.duration(1 / fps * shots, 'seconds')
     }
 
     this.start = () => {
-      startTimelapse()
+      startTimelapse(this.address)
     }
 
     this.stop = () => {
-      stopTimelapse()
+      stopTimelapse(this.address)
     }
 
     this.setExposure = (e) => {
       let exposure = moment.duration(parseFloat(e.target.value), 'seconds')
       this.store.dispatch(setExposure(exposure))
     }
+
+    this.on('hashchanged', (address = 1, motor = 0) => {
+      this.address = parseInt(address)
+      this.motor = parseInt(motor)
+      this.update()
+    })
   </script>
 </timelapse>
