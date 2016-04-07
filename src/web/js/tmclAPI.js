@@ -52,28 +52,39 @@ function dispatchNextPendingInstruction() {
       // Firmware version request is special
       let isStringVersionRequest =
         instruction.instruction === TMCL_GET_FIRMWARE_VERSION && instruction.type === 0;
+      let url = isStringVersionRequest ?
+        `${options.url}?address=${instruction.address || 1}` : options.url
       let requestOptions = {
         method: isStringVersionRequest ? 'GET' : 'POST',
         body: isStringVersionRequest ? undefined : JSON.stringify(instruction)
       }
 
       console.debug('> TMCL Instruction', instruction)
-      return fetch(options.url, requestOptions)
+      return fetch(url, requestOptions)
         .then(checkStatus)
         .then(response => response.json())
         .then(json => {
           console.debug('< TMCL Reply', json)
           dispatch(actions.receiveReply(instruction, json))
-
           // continue dispatching
           dispatch(dispatchNextPendingInstruction())
         })
         .catch(error => {
-          console.debug('< TMCL Error', error)
-          dispatch(actions.receiveError(instruction, error))
-          // continue dispatching
-          // TODO maybe we should abort here?
-          dispatch(dispatchNextPendingInstruction())
+          console.debug('< TMCL Error', error, error.response)
+
+          // see if we can get a JSON error message
+          error.response.json()
+            .then(json => {
+              dispatch(actions.receiveError(instruction, `TMCL Error: ${json.error}`))
+              // continue dispatching
+              dispatch(dispatchNextPendingInstruction())
+            })
+            .catch(() => {
+              dispatch(actions.receiveError(instruction, error))
+              // continue dispatching
+              dispatch(dispatchNextPendingInstruction())
+            })
+
         })
     } else {
       // there is nothing to dispatch
@@ -103,12 +114,6 @@ export function getModuleInfo(address) {
     address: address,
     instruction: TMCL_GET_FIRMWARE_VERSION,
     type: 0
-  })(store.dispatch)
-
-  sendInstruction({
-    address: address,
-    instruction: TMCL_GET_FIRMWARE_VERSION,
-    type: 1
   })(store.dispatch)
 }
 
