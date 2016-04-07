@@ -3,13 +3,13 @@
       <a data-navigation="$previous-page" class="btn pull-left icon icon-arrow-back"></a>
       <a class="btn pull-right" onclick="{ selectMotor }">Motor { motor }</a>
 
-      <h1 class="title">Motor Settings</h1>
+      <h1 class="title">Settings: { module().version }</h1>
   </header>
 
   <div class="content">
       <ul class="list">
         <li class="padded-list" each={ axisParameters }>
-          { label } <span class="pull-right">{ getAxisParameter(address, motor, parameter).value }</span>
+          { label } <span class="pull-right">{ getAxisParameter(parameter).value }</span>
         </li>
       </ul>
   </div>
@@ -36,14 +36,14 @@
       enterMotor(this.address, this.motor)
     }
 
-    this.getAxisParameter = (address, motor, parameter) =>
-      this.getMotor(address, motor).parameters.filter(p => p.parameter == parameter)[0]
+    this.getAxisParameter = (parameter) =>
+      this.getMotor().parameters.find(p => p.parameter == parameter)
 
-    this.getMotor = (address, motor) =>
-      this.getModule(address).motors.filter(m => m.motor == motor)[0]
+    this.getMotor = () =>
+      this.module().motors.find(m => m.motor == this.motor)
 
-    this.getModule = (address) =>
-      this.state().tmcl.modules.filter(m => m.address == address)[0]
+    this.module = () =>
+      this.state().tmcl.modules.find(m => m.address == this.address)
 
     this.store.on('change', () => this.update())
 

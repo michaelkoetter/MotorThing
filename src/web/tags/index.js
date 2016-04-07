@@ -2,7 +2,7 @@
 
 export { default as home } from '../tags/home.html'
 export { default as motorSettings } from '../tags/motor-settings.html'
-export { default as velocity } from '../tags/velocity.html'
+export { default as move } from '../tags/move.html'
 export { default as timelapse } from '../tags/timelapse.html'
 
 export { default as timelapseQuantity } from '../tags/timelapse-quantity.html'

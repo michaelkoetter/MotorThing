@@ -9,7 +9,7 @@
         <ul class="list" each={ state().tmcl.modules }>
             <li class="divider" style="padding-right: 0px">
               <a class="btn btn-flat pull-right icon icon-close" onclick="{ removeModule(address) }"></a>
-              <a if={ version } class="btn btn-flat pull-right icon icon-settings" data-navigation="motor-settings/{ address }"></a>
+              <a if={ version } class="btn btn-flat pull-right icon icon-settings" data-navigation="motor-settings/{ address }/0"></a>
               <a if={ !version } class="btn btn-flat pull-right icon icon-sync" onclick="{ retry(address) }"></a>
 
               Module { address }:
@@ -17,8 +17,8 @@
               <span if={ !version && isPendingVersionRequest(address) }>Searching...</span>
               <span if={ !version && !isPendingVersionRequest(address) }>Not found</span>
             </li>
-            <li if={ version } class="padded-list"><a data-navigation="velocity/{ address }" data-param={ address }>Velocity Mode</a></li>
-            <li if={ version } class="padded-list"><a data-navigation="timelapse/{ address }" data-param={ address }>Timelapse</a></li>
+            <li if={ version } class="padded-list"><a data-navigation="move/{ address }/0" data-param={ address }>Move</a></li>
+            <li if={ version } class="padded-list"><a data-navigation="timelapse/{ address }/0" data-param={ address }>Timelapse</a></li>
         </ul>
 
         <div if={ state().tmcl.modules.length == 0 } class="padded-full">
@@ -26,7 +26,7 @@
             Please add a module.
           </div>
 
-          <button class="btn btn-primary fit-parent padded-top" onclick={ addModule }>Add Module</button>
+          <button class="btn primary fit-parent padded-top" onclick={ addModule }>Add Module</button>
         </div>
     </div>
 

@@ -1,10 +1,10 @@
-<velocity class="app-page">
+<move class="app-page">
     <header class="header-bar">
         <a data-navigation="$previous-page" class="btn pull-left icon icon-arrow-back"></a>
         <a class="btn pull-right" onclick="{ selectMotor }">Motor { motor }</a>
 
         <h1 class="title">
-          Velocity Mode
+          Move: { module().version }
         </h1>
     </header>
 
@@ -12,33 +12,26 @@
         <div class="padded-full">
 
           <div class="input-wrapper">
-              <input class="with-label" type="number" name="speed" id="speed"
-                oninput="{ input }" value="{ model.speed }">
+              <input class="with-label" type="number" min="0" max="2048" step="1" name="speed" id="speed" />
               <label class="floating-label" for="speed">Speed</label>
           </div>
 
-            <ul class="list">
-                <li class="padded-for-list">
-                    <label class="radio">
-                        <input type="radio" name="direction" value="left"
-                          onchange="{ this.input }" checked="{ model.direction == 'left' }">
-                        Rotate Left
-                        <span></span>
-                    </label>
-                </li>
-                <li class="padded-for-list">
-                    <label class="radio">
-                        <input type="radio" name="direction" value="right"
-                          onchange="{ input }" checked="{ model.direction == 'right' }">
-                        Rotate Right
-                        <span></span>
-                    </label>
-                </li>
-            </ul>
-            <button class="btn fit-parent primary padded-top" onclick="{ start }">Start</button>
-            <button class="btn fit-parent negative padded-top" onclick="{ stop }">Stop</button>
-            <button class="btn fit-parent padded-top" onclick="{ setHome }">Set Home</button>
-            <button class="btn fit-parent padded-top" onclick="{ getPosition }">Get Position</button>
+          <div class="row text-center padded-top">
+            <div class="phone-3 column">
+              <button class="btn fit-parent primary icon icon-chevron-left" onclick="{ rotateLeft }"></button>
+            </div>
+            <div class="phone-1 column">&nbsp;</div>
+            <div class="phone-4 column">
+              <button class="btn fit-parent negative" onclick="{ stop }">Stop</button>
+            </div>
+            <div class="phone-1 column">&nbsp;</div>
+            <div class="phone-3 column">
+              <button class="btn fit-parent primary icon icon-chevron-right" onclick="{ rotateRight }"></button>
+            </div>
+          </div>
+
+          <button class="btn fit-parent padded-top" onclick="{ setHome }">Set Home</button>
+          <button class="btn fit-parent padded-top" onclick="{ getPosition }">Get Position</button>
         </div>
 
     </div>
@@ -46,21 +39,11 @@
     <script>
         import phonon from 'phonon'
         import { rotate, stop, setHome, getPosition } from '../js/tmclAPI'
-        import { setEndPosition } from '../js/actions/timelapse.js'
         import { enterMotor } from '../js/ui/dialogs.js'
 
-        this.model = {
-          speed: 100,
-          direction: 'left'
-        }
+        this.speed.value = 100
 
-        this.input = (e) => {
-          this.model[e.target.name] = e.target.value;
-        }
-
-        this.start = () => {
-          rotate(this.address, this.motor, this.model.direction, parseInt(this.model.speed))
-        }
+        this.module = () => this.state().tmcl.modules.find(m => m.address == this.address)
 
         this.setHome = () => {
           setHome(this.address, this.motor)
@@ -68,6 +51,14 @@
 
         this.getPosition = () => {
           getPosition(this.address, this.motor)
+        }
+
+        this.rotateLeft = () => {
+          rotate(this.address, this.motor, 'left', parseInt(this.speed.value))
+        }
+
+        this.rotateRight = () => {
+          rotate(this.address, this.motor, 'right', parseInt(this.speed.value))
         }
 
         this.stop = () => {
@@ -99,4 +90,4 @@
           this.update()
         })
     </script>
-</velocity>
+</move>
