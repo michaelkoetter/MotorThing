@@ -1,0 +1,48 @@
+<timelapse-advanced>
+  <div class="padded-full">
+    <div class="input-wrapper">
+      <input class="with-label" type="number" step="0.1" min="0.0" name="stabilize"
+          oninput="{ setStabilize }"
+          value="{ state().timelapse.stabilize.asSeconds() }">
+      <label class="floating-label" for="time">Stabilize (seconds)</label>
+    </div>
+    <div class="input-wrapper">
+      <input class="with-label" type="number" step="0.1" min="0.0" name="exposure"
+        oninput="{ setExposure }"
+        value="{ state().timelapse.exposure.asSeconds() }">
+      <label class="floating-label" for="exposure">Exposure (seconds)</label>
+    </div>
+
+    <div>
+      <label class="checkbox">
+          <input type="checkbox" class="" name="reverse"
+            onchange="{ setReverse }"
+            checked="{ state().timelapse.reverse }">
+          Reverse
+          <span></span>
+      </label>
+    </div>
+  </div>
+
+  <script>
+    import moment from 'moment'
+    import { setExposure, setStabilize, setReverse } from '../js/actions/timelapse.js'
+    import { setParameter } from '../js/timelapseAPI.js'
+
+    this.setExposure = () => {
+      let exposure = moment.duration(parseFloat(this.exposure.value), 'seconds')
+      this.store.dispatch(setParameter(setExposure(exposure)))
+    }
+
+    this.setStabilize = () => {
+      let stabilize = moment.duration(parseFloat(this.stabilize.value), 'seconds')
+      this.store.dispatch(setParameter(setStabilize(stabilize)))
+    }
+
+    this.setReverse = () => {
+      this.store.dispatch(setParameter(setReverse(this.reverse.checked)))
+    }
+
+    this.store.on('change', () => this.update())
+  </script>
+</timelapse-advanced>

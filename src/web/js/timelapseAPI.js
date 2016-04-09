@@ -1,4 +1,5 @@
 import store from './store'
+import * as actions from './actions/timelapse.js'
 import { setUserVariable, startApplication, stopApplication } from './tmclAPI'
 
 // The start address of our TMCL Application
@@ -29,4 +30,22 @@ export function startTimelapse(address) {
 
 export function stopTimelapse(address) {
   stopApplication(address)
+}
+
+function saveTimelapseState() {
+  localStorage.timelapseState = JSON.stringify(store.getState().timelapse)
+}
+
+export function loadTimelapseState() {
+  let _timelapseState = localStorage.timelapseState
+  if (_timelapseState) {
+    let timelapseState = JSON.parse(_timelapseState)
+    store.dispatch(actions.loadTimelapseState(timelapseState))
+  }
+}
+export function setParameter(action) {
+  return dispatch => {
+    dispatch(action)
+    saveTimelapseState()
+  }
 }

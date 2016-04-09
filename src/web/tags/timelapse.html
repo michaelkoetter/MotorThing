@@ -7,6 +7,7 @@
       <div class="tab-items">
           <a class="tab-item">Quantity</a>
           <a class="tab-item">Time</a>
+          <a class="tab-item">Advanced</a>
       </div>
       <div class="tab-indicator"></div>
   </nav>
@@ -17,12 +18,17 @@
       <div class="tab-content">
           <timelapse-time />
       </div>
+      <div class="tab-content">
+          <timelapse-advanced />
+      </div>
+
   </div>
 
+
   <script>
+    import phonon from 'phonon'
     import moment from 'moment'
-    import { setExposure, setReverse } from '../js/actions/timelapse'
-    import { startTimelapse, stopTimelapse } from '../js/timelapseAPI'
+    import { startTimelapse, stopTimelapse, loadTimelapseState } from '../js/timelapseAPI'
 
     // TODO make this configurable
     this.fps = [
@@ -37,26 +43,25 @@
     }
 
     this.start = () => {
-      startTimelapse(this.address)
+      let dialog = phonon.dialog('#timelapse-start-dialog')
+      dialog.open()
+      dialog.on('confirm', () => {
+        startTimelapse(this.address)
+      })
     }
 
     this.stop = () => {
       stopTimelapse(this.address)
     }
 
-    this.setExposure = (e) => {
-      let exposure = moment.duration(parseFloat(e.target.value), 'seconds')
-      this.store.dispatch(setExposure(exposure))
-    }
-
-    this.setReverse = (e) => {
-      this.store.dispatch(setReverse(e.target.checked))
-    }
-
     this.on('hashchanged', (address = 1, motor = 0) => {
       this.address = parseInt(address)
       this.motor = parseInt(motor)
       this.update()
+    })
+
+    this.on('create', () => {
+      loadTimelapseState()
     })
   </script>
 </timelapse>

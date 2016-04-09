@@ -32,6 +32,7 @@ riot.mixin(globalMixin)
 // manually mount top-level tags that are not pages
 riot.mount('tmcl-notification')
 riot.mount('number-dialog')
+riot.mount('timelapse-start-dialog')
 
 let app = phonon.navigator();
 app.start();

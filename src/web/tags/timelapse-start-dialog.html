@@ -1,0 +1,24 @@
+<timelapse-start-dialog>
+  <div class="dialog" data-cancelable="true" id="timelapse-start-dialog">
+    <div class="content">
+      <div class="padded-full">
+        <h3>Start Timelapse?</h3>
+        <div class="fit-parent">Number of Shots <span class="pull-right"><b>{ state().timelapse.shots }</b></span></div>
+        <div class="fit-parent">Interval <span class="pull-right"><b>{ state().timelapse.interval.asSeconds() }s</b></span></div>
+        <div class="fit-parent">Stabilize <span class="pull-right"><b>{ state().timelapse.stabilize.asSeconds() }s</b></span></div>
+        <div class="fit-parent">Exposure <span class="pull-right"><b>{ state().timelapse.exposure.asSeconds() }s</b></span></div>
+        <div class="fit-parent">Reverse <span class="pull-right"><b>{ state().timelapse.reverse ? 'Yes' : 'No' }</b></span></div>
+
+        <div class="padded-top">The shooting time will be <b>{ state().timelapse.time.format('h[h] m[m] s[s]') }</b>.</span></div>
+      </div>
+    </div>
+    <ul class="buttons">
+      <li><a class="btn btn-flat btn-cancel" data-dialog-close="true">No</a></li>
+      <li><a class="btn btn-flat primary btn-confirm" data-dialog-close="true">Yes</a></li>
+    </ul>
+  </div>
+
+  <script>
+    this.store.on('change', () => this.update())
+  </script>
+</timelapse-start-dialog>

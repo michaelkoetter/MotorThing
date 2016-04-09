@@ -12,22 +12,6 @@
             value="{ state().timelapse.interval.asSeconds() }">
         <label class="floating-label" for="interval">Interval (seconds)</label>
       </div>
-      <div class="input-wrapper">
-        <input class="with-label" type="number" step="0.1" min="0.0" name="exposure"
-          oninput="{ parent.setExposure }"
-          value="{ state().timelapse.exposure.asSeconds() }">
-        <label class="floating-label" for="exposure">Exposure (seconds)</label>
-      </div>
-
-      <div>
-        <label class="checkbox">
-            <input type="checkbox" class="" name="reverse"
-              onchange="{ parent.setReverse }"
-              checked="{ state().timelapse.reverse }">
-            Reverse
-            <span></span>
-        </label>
-      </div>
 
       <table class="table padded-top" style="width: 100%">
         <tr>
@@ -63,12 +47,13 @@
 
   <script>
     import moment from 'moment';
-    import { setTimeAndInterval } from '../js/actions/timelapse'
+    import { setTimeAndInterval } from '../js/actions/timelapse.js'
+    import { setParameter } from '../js/timelapseAPI.js'
 
     this.setTimeAndInterval = () => {
       let time = moment.duration(parseInt(this.time.value), 'minutes')
       let interval = moment.duration(parseFloat(this.interval.value), 'seconds')
-      this.store.dispatch(setTimeAndInterval(time, interval))
+      this.store.dispatch(setParameter(setTimeAndInterval(time, interval)))
     }
 
     this.store.on('change', () => this.update())
