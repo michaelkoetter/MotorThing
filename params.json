@@ -1,0 +1,6 @@
+{
+  "name": "Motorthing",
+  "tagline": "WiFi-enabled Motion Control",
+  "body": "# MotorThing - WiFi-enabled Motion Control\r\n\r\nThe MotorThing is a WiFi bridge for [Trinamic TMCL][TMCL] (_Trinamic Motion Control\r\nLanguage_) products, such as the TMCM-1110 'StepRocker' board or PANdrive\r\nmotors.\r\n\r\nTMCL instructions can be sent using a simple HTTP JSON interface. A serial\r\ninterface (RS-485) is used to communicate with the TMCL module.\r\n\r\n[TMCL]: http://www.trinamic.com/software-tools/tmcl-ide\r\n[Bower]: http://bower.io/\r\n[Gulp]: http://gulpjs.com/\r\n[nodejs]: http://nodejs.org/\r\n[PlatformIO]: http://platformio.org/\r\n[FNV1a]: https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
