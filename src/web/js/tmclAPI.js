@@ -35,7 +35,7 @@ export const MOVE_RELATIVE = 1 // eslint-disable-line no-unused-vars
 export const MOVE_TO_COORDINATE = 2 // eslint-disable-line no-unused-vars
 
 let options = {
-  url: 'http://192.168.4.1/tmcl'
+  url: 'tmcl'
 };
 
 // Check the TMCL API response
