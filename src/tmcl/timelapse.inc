@@ -12,6 +12,7 @@ IntervalTicks       = 1
 StabilizeTicks      = 2
 ShootTicks          = 3
 Reverse             = 4
+EaseShots           = 5
 
 //////////////////////////////////////////////////////////////////////////////
 // User Variables - Status
@@ -28,39 +29,76 @@ EndCoordinate       = 1
 //////////////////////////////////////////////////////////////////////////////
 // Internal Variables
 //////////////////////////////////////////////////////////////////////////////
-// calculated position increment between shots
-PositionIncrement   = 20
-// time of next move
-NextMoveTicks       = 21
-// start of the loop iteration
-LoopStartTicks      = 22
 
+// trapezoidal motion profile parameters
+// Acceleration is calculated at start
+Acceleration        = 20
+// Velocity is updated for every interval
+Velocity            = 21
+// TargetPosition is updated for every interval
+TargetPosition      = 22
+
+// time of next move
+NextMoveTicks       = 23
+// start of the loop iteration
+LoopStartTicks      = 24
+
+Temp1               = 30
+Temp2               = 31
+Temp3               = 32
+
+// Scale for Acceleration & Velocity
+_Scale              = 100
+
+Timelapse_Test:
+  SGP   Shots, 2, 300
+  SGP   IntervalTicks, 2, 2000
+  SGP   ShootTicks, 2, 100
+  SGP   StabilizeTicks, 2, 100
+  SGP   Reverse, 2, 0
+  SGP   EaseShots, 2, 100
 
 Timelapse_Main:
   //reset current shot & actual interval ticks
   SGP   CurrentShot, 2, 0    	
   SGP   ActualIntervalTicks, 2, 0
 
+  // reset trapezoidal motion profile params
+  SGP   Acceleration, 2, 0
+  SGP   Velocity, 2, 0
+
   // Copy EndCoordinate from EEPROM to RAM
   // This is required for some modules that default to store coordindates in RAM only 
   // - other modules will probably ignore it
   GCO   EndCoordinate, 255
 
-  // calculate the position increment between shots
-  // PositionIncrement = (EndPosition - StartPosition) / (Shots - 1)
+  // Calculate trapezoidal motion profile Acceleration
+  // Acceleration   = Distance / (Shots - EaseShots) / EaseShots
+  //   Distance     = EndPosition - StartPosition
   CSUB  Timelapse_Get_StartPosition
   CALCX SWAP
   CSUB  Timelapse_Get_EndPosition
-  CALCX SUB                               // EndPosition - StartPosition
+  CALCX SUB                               // Distance = EndPosition - StartPosition
+  AGP   Temp1, 2                          // => Temp1
+
+  GGP   EaseShots, 2
   CALCX SWAP
   GGP   Shots, 2
-  CALC  SUB, 1 						 // Shots - 1
-  CALCX SWAP
-  CALCX DIV					          // (EndPosition - StartPosition) / (Shots - 1)
-  AGP   PositionIncrement, 2
+  CALCX SUB                               // (Shots - EaseShots)
 
+  CALCX SWAP
+  GGP   Temp1, 2					   // Distance
+  CALCX DIV                               // ... / (Shots - EaseShots)
+
+  CALCX SWAP
+  GGP   EaseShots, 2
+  CALCX SWAP
+  CALCX DIV                               // ... / EaseShots
+  AGP   Acceleration, 2                   // => Acceleration
+
+  // Set Start position
   CSUB  Timelapse_Get_StartPosition
-  CSUB  Util_MoveTo
+  AGP   TargetPosition, 2
 
 Timelapse_Loop:
   GGP   132, 0				        // get tick timer (1ms resolution)
@@ -71,25 +109,43 @@ Timelapse_Loop:
   CALCX ADD
   AGP   NextMoveTicks, 2
 
-  // calculate next position and move
-  // target position = StartPosition + (CurrentShot * PositionIncrement)
-  GGP   CurrentShot, 2
-  CALCX SWAP
-  GGP   PositionIncrement, 2
-  CALCX MUL					          // CurrentShot * PositionIncrement
-  CALCX SWAP
-  CSUB  Timelapse_Get_StartPosition
-  CALCX ADD					          // StartPosition + (CurrentShot * PositionIncrement)
-  CSUB  Util_MoveTo			          // set new target position
-
-  // wait for StabilizeTicks
-  GGP   StabilizeTicks, 2
-  CSUB  Util_Wait
+  // Move to current TargetPosition
+  GGP   TargetPosition, 2
+  MVP   REL, 0, 0
+  AAP   0, 0
 
   // increment CurrentShot
   GGP   CurrentShot, 2
   CALC  ADD, 1				        // CurrentShot + 1
   AGP   CurrentShot, 2
+
+  // Calculate next TargetPosition while we move
+  // Position    = Position + Velocity + (Acceleration / 2)
+  //   Velocity  = Velocity + Acceleration
+  CSUB  Timelapse_Get_Acceleration
+  CALCX SWAP
+  GGP   Velocity, 2
+  CALCX ADD                          // Velocity + Acceleration
+  AGP   Velocity, 2                  // => Velocity
+
+  CSUB  Timelapse_Get_Acceleration
+  CALC  DIV, 2                        // (Acceleration / 2)
+  CALCX SWAP
+  GGP   Velocity, 2
+  CALCX ADD                           // ... + Velocity
+  CALCX SWAP
+  GGP   TargetPosition, 2
+  CALCX ADD                           // ... + Position
+
+  // store next TargetPosition
+  AGP   TargetPosition, 2
+
+  // wait until we reach our current target position
+  WAIT POS, 0, 0
+
+  // wait for StabilizeTicks
+  GGP   StabilizeTicks, 2
+  CSUB  Util_Wait
 
   // shoot
   SIO 0, 2, 1    //change DOUT0
@@ -149,6 +205,38 @@ _Get_EndPosition_Reverse:
   CALC  LOAD, 0
   RSUB
 
+// Get the current acceleration
+// Depends on the current phase of the trapezoidal motion profile
+Timelapse_Get_Acceleration:
+  GGP   CurrentShot, 2
+  CALCX SWAP
+  GGP   EaseShots, 2
+  CALCX SUB					  // EaseShots - CurrentShot
+  COMP  0
+  JC    LT, _Phase_Slew             // CurrentShot > EaseShots ?
+
+_Phase_Accelerate:
+  GGP   Acceleration, 2
+  RSUB
+
+_Phase_Slew:
+  GGP   EaseShots, 2
+  CALCX SWAP
+  GGP   Shots, 2
+  CALCX SUB                         // Shots - EaseShots
+  CALCX SWAP
+  GGP   CurrentShot, 2 
+  CALCX SUB                         // CurrentShot - (Shots - EaseShots)
+  COMP  0
+  JC    GT, _Phase_Decelerate       // CurrentShot > (Shots - EaseShots) ?
+
+  CALC  LOAD, 0
+  RSUB
+
+_Phase_Decelerate:
+  GGP   Acceleration, 2
+  CALC  MUL, -1
+  RSUB
 
 Timelapse_Stop:
   //reset current shot & actual interval ticks
