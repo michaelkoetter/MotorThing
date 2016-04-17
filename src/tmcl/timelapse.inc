@@ -103,23 +103,36 @@ Timelapse_Main:
 Timelapse_Loop:
   GGP   132, 0				        // get tick timer (1ms resolution)
   AGP   LoopStartTicks, 2
+  
   // calculate next move time: now + IntervalTicks
   CALCX SWAP
   GGP   IntervalTicks, 2
   CALCX ADD
   AGP   NextMoveTicks, 2
 
-  // Move to current TargetPosition
+  // Move to next TargetPosition
   GGP   TargetPosition, 2
-  MVP   REL, 0, 0
-  AAP   0, 0
+  CSUB  Util_MoveTo
+
+  // wait for StabilizeTicks
+  GGP   StabilizeTicks, 2
+  CSUB  Util_Wait
+
+  // shoot
+  SIO 0, 2, 1    //change DOUT0
+
+  // wait for ShootTicks
+  GGP   ShootTicks, 2
+  CSUB  Util_Wait
+
+  SIO 0, 2, 0    //change DOUT0
 
   // increment CurrentShot
   GGP   CurrentShot, 2
   CALC  ADD, 1				        // CurrentShot + 1
   AGP   CurrentShot, 2
 
-  // Calculate next TargetPosition while we move
+  // Calculate next TargetPosition
   // Position    = Position + Velocity + (Acceleration / 2)
   //   Velocity  = Velocity + Acceleration
   CSUB  Timelapse_Get_Acceleration
@@ -139,22 +152,6 @@ Timelapse_Loop:
 
   // store next TargetPosition
   AGP   TargetPosition, 2
-
-  // wait until we reach our current target position
-  WAIT POS, 0, 0
-
-  // wait for StabilizeTicks
-  GGP   StabilizeTicks, 2
-  CSUB  Util_Wait
-
-  // shoot
-  SIO 0, 2, 1    //change DOUT0
-
-  // wait for ShootTicks
-  GGP   ShootTicks, 2
-  CSUB  Util_Wait
-
-  SIO 0, 2, 0    //change DOUT0
 
   // wait until NextMoveTicks
   GGP   NextMoveTicks, 2
@@ -177,7 +174,6 @@ Timelapse_Loop:
   AGP   ActualIntervalTicks, 2
 
   JA    Timelapse_Loop
-
 
 Timelapse_Get_StartPosition:
   GGP   Reverse, 2
