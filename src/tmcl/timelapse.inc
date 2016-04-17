@@ -47,8 +47,11 @@ Temp1               = 30
 Temp2               = 31
 Temp3               = 32
 
-// Scale for Acceleration & Velocity
-_Scale              = 100
+// We scale our position values to +/- 2^31 to reduce rounding errors
+PositionScale       = 33
+
+// 2^31
+MaxInt              = 2147483648
 
 Timelapse_Test:
   SGP   Shots, 2, 300
@@ -79,7 +82,13 @@ Timelapse_Main:
   CALCX SWAP
   CSUB  Timelapse_Get_EndPosition
   CALCX SUB                               // Distance = EndPosition - StartPosition
+  CALCX LOAD
+  CALC  LOAD, MaxInt
+  CALCX DIV							 // Position Scale = MaxInt / Distance
+  AGP   PositionScale, 2                  // => PositionScale
+  CALCX MUL                               // Scaled Distance = PositionScale * Distance
   AGP   Temp1, 2                          // => Temp1
+  
 
   GGP   EaseShots, 2
   CALCX SWAP
@@ -87,7 +96,7 @@ Timelapse_Main:
   CALCX SUB                               // (Shots - EaseShots)
 
   CALCX SWAP
-  GGP   Temp1, 2					   // Distance
+  GGP   Temp1, 2                          // Scaled Distance
   CALCX DIV                               // ... / (Shots - EaseShots)
 
   CALCX SWAP
@@ -96,8 +105,9 @@ Timelapse_Main:
   CALCX DIV                               // ... / EaseShots
   AGP   Acceleration, 2                   // => Acceleration
 
-  // Set Start position
+  // Set scaled start position
   CSUB  Timelapse_Get_StartPosition
+  CSUB  Timelapse_Position_Scale_Up
   AGP   TargetPosition, 2
 
 Timelapse_Loop:
@@ -112,6 +122,7 @@ Timelapse_Loop:
 
   // Move to next TargetPosition
   GGP   TargetPosition, 2
+  CSUB  Timelapse_Position_Scale_Down
   CSUB  Util_MoveTo
 
   // wait for StabilizeTicks
@@ -232,6 +243,21 @@ _Phase_Slew:
 _Phase_Decelerate:
   GGP   Acceleration, 2
   CALC  MUL, -1
+  RSUB
+
+// Scale up a "real" postion value using the PositionScale factor
+Timelapse_Position_Scale_Up:
+  CALCX SWAP
+  GGP   PositionScale, 2
+  CALCX MUL
+  RSUB
+
+// Scale down a position value using the PositionScale factor
+Timelapse_Position_Scale_Down:
+  CALCX SWAP
+  GGP   PositionScale, 2
+  CALCX SWAP
+  CALCX DIV
   RSUB
 
 Timelapse_Stop:
