@@ -53,17 +53,9 @@ PositionScale       = 33
 // 2^31
 MaxInt              = 2147483648
 
-Timelapse_Test:
-  SGP   Shots, 2, 300
-  SGP   IntervalTicks, 2, 2000
-  SGP   ShootTicks, 2, 100
-  SGP   StabilizeTicks, 2, 100
-  SGP   Reverse, 2, 0
-  SGP   EaseShots, 2, 100
-
 Timelapse_Main:
   //reset current shot & actual interval ticks
-  SGP   CurrentShot, 2, 0    	
+  SGP   CurrentShot, 2, 0
   SGP   ActualIntervalTicks, 2, 0
 
   // reset trapezoidal motion profile params
@@ -71,7 +63,7 @@ Timelapse_Main:
   SGP   Velocity, 2, 0
 
   // Copy EndCoordinate from EEPROM to RAM
-  // This is required for some modules that default to store coordindates in RAM only 
+  // This is required for some modules that default to store coordindates in RAM only
   // - other modules will probably ignore it
   GCO   EndCoordinate, 255
 
@@ -88,7 +80,7 @@ Timelapse_Main:
   AGP   PositionScale, 2                  // => PositionScale
   CALCX MUL                               // Scaled Distance = PositionScale * Distance
   AGP   Temp1, 2                          // => Temp1
-  
+
 
   GGP   EaseShots, 2
   CALCX SWAP
@@ -113,7 +105,7 @@ Timelapse_Main:
 Timelapse_Loop:
   GGP   132, 0				        // get tick timer (1ms resolution)
   AGP   LoopStartTicks, 2
-  
+
   // calculate next move time: now + IntervalTicks
   CALCX SWAP
   GGP   IntervalTicks, 2
@@ -232,7 +224,7 @@ _Phase_Slew:
   GGP   Shots, 2
   CALCX SUB                         // Shots - EaseShots
   CALCX SWAP
-  GGP   CurrentShot, 2 
+  GGP   CurrentShot, 2
   CALCX SUB                         // CurrentShot - (Shots - EaseShots)
   COMP  0
   JC    GT, _Phase_Decelerate       // CurrentShot > (Shots - EaseShots) ?
@@ -262,7 +254,7 @@ Timelapse_Position_Scale_Down:
 
 Timelapse_Stop:
   //reset current shot & actual interval ticks
-  SGP   CurrentShot, 2, 0    	
+  SGP   CurrentShot, 2, 0
   SGP   ActualIntervalTicks, 2, 0
 
   // move to start

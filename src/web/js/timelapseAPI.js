@@ -12,6 +12,7 @@ const PARAM_INTERVAL = 1
 const PARAM_STABILIZE = 2
 const PARAM_EXPOSURE = 3
 const PARAM_REVERSE = 4
+const PARAM_EASE_SHOTS = 5
 
 export function startTimelapse(address) {
   // setup
@@ -23,6 +24,7 @@ export function startTimelapse(address) {
   setUserVariable(address, PARAM_STABILIZE, timelapse.stabilize.asMilliseconds())
   setUserVariable(address, PARAM_EXPOSURE, timelapse.exposure.asMilliseconds())
   setUserVariable(address, PARAM_REVERSE, timelapse.reverse ? 1 : 0)
+  setUserVariable(address, PARAM_EASE_SHOTS, timelapse.easeShots)
 
   // start the application
   startApplication(address, APPLICATION_ADDRESS)
