@@ -7,19 +7,18 @@ function timelapse(state = {
                     time: moment.duration(300, 'seconds'),
                     exposure: moment.duration(100, 'milliseconds'),
                     stabilize: moment.duration(100, 'milliseconds'),
+                    easeShots: 1,
                     reverse: false
                   }, action) {
 
   switch (action.type) {
     case actions.LOAD_TIMELAPSE_STATE:
-      return {
-        shots: action.savedState.shots,
+      return Object.assign({}, state, action.savedState, {
         interval: moment.duration(action.savedState.interval),
         time: moment.duration(action.savedState.time),
         exposure: moment.duration(action.savedState.exposure),
-        stabilize: moment.duration(action.savedState.stabilize),
-        reverse: action.savedState.reverse
-      }
+        stabilize: moment.duration(action.savedState.stabilize)
+      })
 
     case actions.SET_SHOTS_AND_INTERVAL:
       // calculate time
@@ -42,6 +41,9 @@ function timelapse(state = {
 
     case actions.SET_STABILIZE:
       return Object.assign({}, state, { stabilize: action.stabilize })
+
+   case actions.SET_EASE_SHOTS:
+      return Object.assign({}, state, { easeShots: action.easeShots })
 
    case actions.SET_REVERSE:
       return Object.assign({}, state, { reverse: action.reverse })

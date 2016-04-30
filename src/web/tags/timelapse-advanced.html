@@ -22,12 +22,95 @@
           <span></span>
       </label>
     </div>
+
+    <div class="input-wrapper">
+      <input class="with-label" type="number" step="1" min="1" max="{ Math.round(state().timelapse.shots / 2) }" name="easeShots"
+        oninput="{ setEaseShots }"
+        value="{ state().timelapse.easeShots }">
+      <label class="floating-label" for="exposure">Ease in/out (shots)</label>
+    </div>
+
+    <div class="padded-top">
+      <canvas class="fit-parent" id="motionProfileChart"></canvas>
+    </div>
   </div>
 
   <script>
     import moment from 'moment'
-    import { setExposure, setStabilize, setReverse } from '../js/actions/timelapse.js'
+    import Chart from 'chart.js'
+    import { setExposure, setStabilize, setEaseShots, setReverse } from '../js/actions/timelapse.js'
     import { setParameter } from '../js/timelapseAPI.js'
+
+    let self = this
+
+    this.getChartLabels = () => {
+      let labels = []
+      for (var i = 0; i <= this.state().timelapse.shots; i++) {
+        labels.push(i)
+      }
+      return labels
+    }
+
+    function acceleration(time) {
+      let accelerateUntil = self.state().timelapse.easeShots
+      let decelerateAfter = self.state().timelapse.shots - accelerateUntil
+      if (time <= accelerateUntil) {
+        return 1
+      } else if (time <= decelerateAfter) {
+        return 0
+      } else {
+        return -1
+      }
+    }
+
+    function velocity(ctx = { v: 0 }) {
+      return function(time) {
+        ctx.v = ctx.v + acceleration(time)
+        return ctx.v
+      }
+    }
+
+    function position(ctx = { v: 0, p: 0 }) {
+      return function(time) {
+        ctx.v = ctx.v + acceleration(time)
+        ctx.p = ctx.p + ctx.v + (acceleration(time) / 2)
+        return ctx.p
+      }
+    }
+
+    this.getChartData = () => {
+      let labels = this.getChartLabels()
+      return {
+        labels,
+        datasets: [
+          {
+            label: 'Velocity',
+            yAxisID: 'velocity',
+            data: labels.map(velocity()),
+            borderColor: 'rgb(0, 132, 231)',
+            backgroundColor: 'rgba(0, 132, 231, 0.3)',
+            borderWidth: 2,
+            tension: 0,
+            radius: 0
+          },
+          {
+            label: 'Position',
+            yAxisID: 'position',
+            data: labels.map(position()),
+            borderColor: 'rgb(132, 132, 132)',
+            fill: false,
+            borderWidth: 2,
+            tension: 0,
+            radius: 0
+          }
+        ]
+      }
+    }
+
+    this.updateChart = () => {
+      this.motionProfileChartConfig.data = this.getChartData()
+      this.motionProfileChart.update()
+    }
 
     this.setExposure = () => {
       let exposure = moment.duration(parseFloat(this.exposure.value), 'seconds')
@@ -39,10 +122,62 @@
       this.store.dispatch(setParameter(setStabilize(stabilize)))
     }
 
+    this.setEaseShots = () => {
+        this.store.dispatch(setParameter(setEaseShots(parseInt(this.easeShots.value))))
+    }
+
     this.setReverse = () => {
       this.store.dispatch(setParameter(setReverse(this.reverse.checked)))
     }
 
-    this.store.on('change', () => this.update())
+    this.store.on('change', () => {
+      this.updateChart()
+      this.update()
+    })
+
+    this.on('mount', () => {
+      this.motionProfileChartConfig = {
+        data: this.getChartData(),
+        options: {
+          responsive: true,
+          title: {
+            display: true,
+            fontSize: 14,
+            fontStyle: 'normal',
+            text: 'Motion Profile'
+          },
+          legend: {
+            position: 'bottom'
+          },
+          tooltips: {
+            enabled: false
+          },
+          animation: {
+            duration: 0
+          },
+          scales: {
+            xAxes: [{
+              display: false
+            }],
+            yAxes: [
+              {
+                id: 'velocity',
+                type: 'linear',
+                display: false
+              },
+              {
+                id: 'position',
+                type: 'linear',
+                display: false
+              }
+            ]
+          }
+        }
+      }
+
+      this.motionProfileChart = Chart.Line(
+        document.getElementById('motionProfileChart'),
+        this.motionProfileChartConfig)
+    })
   </script>
 </timelapse-advanced>

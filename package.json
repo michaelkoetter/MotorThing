@@ -13,6 +13,7 @@
   "main": "src/web/js/app.js",
   "dependencies": {
     "Phonon-Framework": "michaelkoetter/Phonon-Framework.git#fix-dialog-callbacks",
+    "chart.js": "^2.0.2",
     "isomorphic-fetch": "^2.2.1",
     "moment": "^2.12.0",
     "moment-duration-format": "^1.3.0",

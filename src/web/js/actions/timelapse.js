@@ -6,6 +6,7 @@ export const SET_SHOTS_AND_INTERVAL = 'SET_SHOTS_AND_INTERVAL'
 export const SET_TIME_AND_INTERVAL = 'SET_TIME_AND_INTERVAL'
 export const SET_EXPOSURE = 'SET_EXPOSURE'
 export const SET_STABILIZE = 'SET_STABILIZE'
+export const SET_EASE_SHOTS = 'SET_EASE_SHOTS'
 export const SET_REVERSE = 'SET_REVERSE'
 
 // Action Creators
@@ -45,6 +46,13 @@ export function setStabilize(stabilize) {
     type: SET_STABILIZE,
     stabilize
   }
+}
+
+export function setEaseShots(easeShots) {
+    return {
+      type: SET_EASE_SHOTS,
+      easeShots
+    }
 }
 
 export function setReverse(reverse) {
