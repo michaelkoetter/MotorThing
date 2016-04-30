@@ -48,10 +48,9 @@ Temp2               = 31
 Temp3               = 32
 
 // We scale our position values to +/- 2^31 to reduce rounding errors
-PositionScale       = 33
+// The max. position is +/- 2^23 so we can scale by 2^8
+PositionScale       = 256
 
-// 2^31
-MaxInt              = 2147483648
 
 Timelapse_Main:
   //reset current shot & actual interval ticks
@@ -74,11 +73,7 @@ Timelapse_Main:
   CALCX SWAP
   CSUB  Timelapse_Get_EndPosition
   CALCX SUB                               // Distance = EndPosition - StartPosition
-  CALCX LOAD
-  CALC  LOAD, MaxInt
-  CALCX DIV							 // Position Scale = MaxInt / Distance
-  AGP   PositionScale, 2                  // => PositionScale
-  CALCX MUL                               // Scaled Distance = PositionScale * Distance
+  CALC  MUL, PositionScale                // Scaled Distance = PositionScale * Distance
   AGP   Temp1, 2                          // => Temp1
 
 
@@ -99,7 +94,7 @@ Timelapse_Main:
 
   // Set scaled start position
   CSUB  Timelapse_Get_StartPosition
-  CSUB  Timelapse_Position_Scale_Up
+  CALC  MUL, PositionScale
   AGP   TargetPosition, 2
 
 Timelapse_Loop:
@@ -114,7 +109,7 @@ Timelapse_Loop:
 
   // Move to next TargetPosition
   GGP   TargetPosition, 2
-  CSUB  Timelapse_Position_Scale_Down
+  CALC  DIV, PositionScale
   CSUB  Util_MoveTo
 
   // wait for StabilizeTicks
@@ -235,21 +230,6 @@ _Phase_Slew:
 _Phase_Decelerate:
   GGP   Acceleration, 2
   CALC  MUL, -1
-  RSUB
-
-// Scale up a "real" postion value using the PositionScale factor
-Timelapse_Position_Scale_Up:
-  CALCX SWAP
-  GGP   PositionScale, 2
-  CALCX MUL
-  RSUB
-
-// Scale down a position value using the PositionScale factor
-Timelapse_Position_Scale_Down:
-  CALCX SWAP
-  GGP   PositionScale, 2
-  CALCX SWAP
-  CALCX DIV
   RSUB
 
 Timelapse_Stop:
