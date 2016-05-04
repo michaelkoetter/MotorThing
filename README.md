@@ -11,6 +11,8 @@ motors.
 TMCL instructions can be sent using a simple HTTP JSON interface. A serial
 interface (RS-485) is used to communicate with the TMCL module.
 
+Our first application is a motion controller for ["Shoot-Move-Shoot" timelapse](https://www.youtube.com/watch?v=dHVb6sCkjyk) video.
+
 ## Hardware
 
 MotorThing requires an ESP8266 MCU and a TMCL enabled stepper motor controller.
