@@ -11,7 +11,11 @@ motors.
 TMCL instructions can be sent using a simple HTTP JSON interface. A serial
 interface (RS-485) is used to communicate with the TMCL module.
 
-Our first application is a motion controller for ["Shoot-Move-Shoot" timelapse](https://www.youtube.com/watch?v=dHVb6sCkjyk) video.
+Our first application is ["Shoot-Move-Shoot" timelapse video](https://www.youtube.com/watch?v=dHVb6sCkjyk),
+controlled by a mobile web application.
+
+![Timelapse Settings](doc/screenshot1.png?raw=true)
+![Timelapse Advanced Settings](doc/screenshot2.png?raw=true)
 
 ## Hardware
 
