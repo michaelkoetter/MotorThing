@@ -64,7 +64,10 @@ function dispatchNextPendingInstruction() {
         `${options.url}?address=${instruction.address || 1}` : options.url
       let requestOptions = {
         method: isStringVersionRequest ? 'GET' : 'POST',
-        body: isStringVersionRequest ? undefined : JSON.stringify(instruction)
+        body: isStringVersionRequest ? undefined : JSON.stringify(instruction),
+        headers: isStringVersionRequest ? {} : {
+          'Content-Type': 'application/json'
+        }
       }
 
       console.debug('> TMCL Instruction', instruction)
@@ -221,6 +224,13 @@ export function setAxisParameter(address, motor, param, value) {
     motor,
     type: param,
     value: value
+  })(store.dispatch)
+
+  sendInstruction({
+    address,
+    instruction: TMCL_STORE_AXIS_PARAMETER,
+    motor,
+    type: param
   })(store.dispatch)
 }
 

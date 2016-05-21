@@ -9,17 +9,20 @@
   <div class="content">
       <ul class="list">
         <li class="padded-list" each={ axisParameters }>
-          { label } <span class="pull-right">{ getAxisParameter(parameter).value }</span>
+          <a onclick="{ parent.changeParameter }">
+            { label } <span class="pull-right">{ getAxisParameter(parameter).value }</span>
+          </a>
         </li>
       </ul>
   </div>
 
   <script>
-    import { getAxisParameter } from '../js/tmclAPI.js'
-    import { enterMotor } from '../js/ui/dialogs.js'
+    import { getAxisParameter, setAxisParameter } from '../js/tmclAPI.js'
+    import { enterMotor, enterNumber } from '../js/ui/dialogs.js'
 
     this.axisParameters = [
       { parameter: 4, label: 'Maximum Positioning Speed'},
+      { parameter: 5, label: 'Acceleration'},
       { parameter: 6, label: 'Absolute Maximum Current'},
       { parameter: 7, label: 'Standby Current'},
       { parameter: 140, label: 'Microstep Resolution'},
@@ -34,6 +37,14 @@
 
     this.selectMotor = () => {
       enterMotor(this.address, this.motor)
+    }
+
+    this.changeParameter = (event) => {
+      let _label = event.item.label
+      let _parameter = this.getAxisParameter(event.item.parameter)
+      enterNumber(_label, { value: _parameter.value, step: 1 }, (input) => {
+        setAxisParameter(this.address, this.motor, _parameter.parameter, parseInt(input))
+      })
     }
 
     this.getAxisParameter = (parameter) =>
