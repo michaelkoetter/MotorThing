@@ -8,6 +8,7 @@ import uglify from 'gulp-uglify';
 import cssnano from 'gulp-cssnano';
 import gzip from 'gulp-gzip';
 import webserver from 'gulp-webserver';
+import bodyParser from 'body-parser';
 import RevAll from 'gulp-rev-all';
 import hashsum from 'gulp-hashsum';
 import flatten from 'gulp-flatten';
@@ -43,14 +44,16 @@ gulp.task('webserver', ['rev-all'], () => {
       livereload: true,
       //open: 'index.htm',
       middleware: [
+        bodyParser.json(),
         function(req, res, next) {
           //gutil.log(req, res);
-          if (req.url == '/tmcl') {
+          if (req.url.startsWith('/tmcl')) {
             setTimeout(() => {
               if (req.method == 'GET') {
-                res.end(JSON.stringify({version: 'SIMULATION'}))
+                res.end(JSON.stringify({address: 1, version: 'SIMULATION'}))
               } else if (req.method == 'POST') {
-                res.end(JSON.stringify({status: 100}))
+                let reply = Object.assign({ value: 123, status: 100 }, req.body)
+                res.end(JSON.stringify(reply))
               } else {
                 res.end()
               }

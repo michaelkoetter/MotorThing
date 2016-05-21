@@ -26,6 +26,7 @@
     "babel-preset-es2015-riot": "^1.0.3",
     "babel-register": "^6.7.2",
     "babelify": "^7.2.0",
+    "body-parser": "^1.15.1",
     "browserify": "^13.0.0",
     "browserify-shim": "^3.8.12",
     "del": "^2.2.0",
