@@ -158,7 +158,7 @@ void TMCLRequestHandler::handlePost(ESP8266WebServer& server)
 
   TMCLInstruction instruction(m_tmclTelegram);
   instruction.reset();
-  instruction.instruction(request["instruction"].as<char>());
+  instruction.instruction(request["instruction"].as<unsigned char>());
 
 
   instruction.moduleAddress((char) _address);
@@ -167,14 +167,14 @@ void TMCLRequestHandler::handlePost(ESP8266WebServer& server)
     if (!request["type"].is<int>()) {
       return sendStatus(server, _address, "'type' must be an integer", 400);
     }
-    instruction.type(request["type"].as<char>());
+    instruction.type(request["type"].as<unsigned char>());
   }
 
   if (request.containsKey("motor")) {
     if (!request["motor"].is<int>()) {
       return sendStatus(server, _address, "'motor' must be an integer", 400);
     }
-    instruction.motor(request["motor"].as<char>());
+    instruction.motor(request["motor"].as<unsigned char>());
   }
 
   if (request.containsKey("value")) {
