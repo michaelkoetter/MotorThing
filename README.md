@@ -83,7 +83,7 @@ platformio run -t uploadfs
 gulp webserver
 ```
 
-> We are currently builing a 512k SPIFFS filesystem, which means you need
+> We are currently building a 512k SPIFFS filesystem, which means you need
 > at least 1M flash on your ESP8266 module.
 
 ## Automatically Download TMCL Program
@@ -245,7 +245,7 @@ Response:
 }
 ```
 
-[TMCL]: http://www.trinamic.com/software-tools/tmcl-ide
+[TMCL]: http://www.trinamic.com/support/software/
 [Bower]: http://bower.io/
 [Gulp]: http://gulpjs.com/
 [nodejs]: http://nodejs.org/
